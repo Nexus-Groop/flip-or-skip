@@ -20,13 +20,13 @@ class FakeEl {
 class FakeDocument {
   constructor(){
     this.elements={};
-    const ids=['dealForm','buy','sale','shipping','other','marketplace','customRate','customFixed','customFeeWrap','target','targetOut','clearBtn','themeBtn','guideBtn','guide','closeGuide','guideBackdrop','dealHelp','feeHelp','verdictHelp','chartHelp','insightHelp','verdictBox','verdict','feeRate','profit','roi','margin','saleSummary','feeSummary','costSummary','profitBreak','insightFee','insightBreakEven','donut','donutCenter','selfTest'];
+    const ids=['dealForm','buy','sale','shipping','other','marketplace','customRate','customFixed','customFeeWrap','target','targetOut','clearBtn','themeBtn','guideBtn','guide','closeGuide','guideBackdrop','dealHelp','feeHelp','verdictHelp','chartHelp','insightHelp','shareHelp','verdictBox','verdict','feeRate','profit','roi','margin','saleSummary','feeSummary','costSummary','profitBreak','insightFee','insightBreakEven','donut','donutCenter','shareBtn','emailBtn','textBtn','savePngBtn','shareStatus','selfTest'];
     for(const id of ids)this.elements[id]=new FakeEl(id,id==='dealForm'?'form':'div');
-    for(const id of ['dealHelp','feeHelp','verdictHelp','chartHelp','insightHelp']) this.elements[id].hidden=true;
+    for(const id of ['dealHelp','feeHelp','verdictHelp','chartHelp','insightHelp','shareHelp']) this.elements[id].hidden=true;
     this.elements.marketplace.tagName='SELECT'; this.elements.target.tagName='INPUT';
     for(const id of ['buy','sale','shipping','other','customRate','customFixed']) this.elements[id].tagName='INPUT';
-    this.elements.clearBtn.tagName=this.elements.themeBtn.tagName=this.elements.guideBtn.tagName=this.elements.closeGuide.tagName=this.elements.guideBackdrop.tagName='BUTTON';
-    this.helpButtons=['dealHelp','feeHelp','verdictHelp','chartHelp','insightHelp'].map(id=>{const b=new FakeEl(id+'Btn','button');b.dataset.help=id;b.attributes['data-help']=id;return b});
+    this.elements.clearBtn.tagName=this.elements.themeBtn.tagName=this.elements.guideBtn.tagName=this.elements.closeGuide.tagName=this.elements.guideBackdrop.tagName=this.elements.shareBtn.tagName=this.elements.emailBtn.tagName=this.elements.textBtn.tagName=this.elements.savePngBtn.tagName='BUTTON';
+    this.helpButtons=['dealHelp','feeHelp','verdictHelp','chartHelp','insightHelp','shareHelp'].map(id=>{const b=new FakeEl(id+'Btn','button');b.dataset.help=id;b.attributes['data-help']=id;return b});
     this.documentElement={classList:new ClassList(),scrollWidth:390,style:{setProperty:(k,v)=>this.documentElement.style[k]=v,getPropertyValue:(k)=>this.documentElement.style[k]||''}};
     this.body={dataset:{},classList:new ClassList()};
   }
@@ -43,5 +43,5 @@ vm.createContext(context);
 vm.runInContext(fs.readFileSync('../site/shared/calculator.js','utf8'),context);
 vm.runInContext(fs.readFileSync('../site/shared/app.js','utf8'),context);
 const report=elements.selfTest.innerHTML;
-if(!report.includes('Browser self-test: 11/11 passed')){console.error(report);process.exit(1)}
+if(!report.includes('Browser self-test: 12/12 passed')){console.error(report);process.exit(1)}
 console.log('PASS UI controller integration:', report.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim().slice(0,120));
