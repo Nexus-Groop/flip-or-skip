@@ -100,6 +100,247 @@
     });
   });
 
+
+  function dealResult() {
+    return C.calculate(readInput());
+  }
+
+  function pageUrl() {
+    try { return String(global.location.href || '').split('?')[0].split('#')[0]; }
+    catch (_) { return ''; }
+  }
+
+  function buildShareText(result) {
+    return [
+      'FLIP OR SKIP — ' + result.verdict,
+      '',
+      'Buy price: ' + C.money(result.buy),
+      'Expected sale: ' + C.money(result.sale),
+      'Platform: ' + result.marketplace,
+      'Estimated fees: ' + C.money(result.fees),
+      'Shipping: ' + C.money(result.shipping),
+      'Other costs: ' + C.money(result.other),
+      '',
+      'Estimated profit: ' + C.money(result.profit),
+      'ROI: ' + C.percent(result.roi),
+      'Margin: ' + C.percent(result.margin),
+      'Target ROI: ' + C.percent(result.target),
+      '',
+      'Screening estimate — not a guarantee of profit.',
+      pageUrl()
+    ].join('\n');
+  }
+
+  function setShareStatus(message, state) {
+    var el = $('shareStatus');
+    if (!el) return;
+    el.textContent = message;
+    el.dataset.state = state || '';
+  }
+
+  function requireDeal() {
+    var result = dealResult();
+    if (!result.complete) {
+      setShareStatus('Enter a buy price and expected sale before sharing.', 'error');
+      return null;
+    }
+    return result;
+  }
+
+  function drawShareCard(result) {
+    if (!document.createElement) return null;
+    var canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1080;
+    var ctx = canvas.getContext && canvas.getContext('2d');
+    if (!ctx || !canvas.toDataURL) return null;
+
+    var accent = result.verdict === 'BUY' ? '#35e38b' : result.verdict === 'CONSIDER' ? '#ffd166' : '#ff5f66';
+    ctx.fillStyle = '#090b0d';
+    ctx.fillRect(0, 0, 1080, 1080);
+
+    ctx.fillStyle = '#111519';
+    ctx.fillRect(64, 64, 952, 952);
+
+    ctx.fillStyle = '#35e38b';
+    ctx.font = '800 26px Arial, sans-serif';
+    ctx.fillText('FLIP OR SKIP', 112, 132);
+
+    ctx.fillStyle = '#89939d';
+    ctx.font = '600 20px Arial, sans-serif';
+    ctx.fillText('RUN THE NUMBERS BEFORE YOU BUY', 112, 171);
+
+    ctx.fillStyle = '#151a1f';
+    ctx.fillRect(112, 220, 856, 150);
+    ctx.fillStyle = accent;
+    ctx.font = '900 64px Arial, sans-serif';
+    ctx.fillText(result.verdict, 148, 316);
+    ctx.fillStyle = '#f5f7f8';
+    ctx.font = '700 24px Arial, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillText(result.marketplace, 932, 286);
+    ctx.fillStyle = '#89939d';
+    ctx.font = '600 20px Arial, sans-serif';
+    ctx.fillText('Target ROI ' + C.percent(result.target), 932, 322);
+    ctx.textAlign = 'left';
+
+    var metrics = [
+      ['PROFIT', C.money(result.profit)],
+      ['ROI', C.percent(result.roi)],
+      ['MARGIN', C.percent(result.margin)]
+    ];
+    metrics.forEach(function (m, i) {
+      var x = 112 + i * 286;
+      ctx.fillStyle = '#151a1f';
+      ctx.fillRect(x, 402, 260, 132);
+      ctx.fillStyle = '#89939d';
+      ctx.font = '700 17px Arial, sans-serif';
+      ctx.fillText(m[0], x + 24, 443);
+      ctx.fillStyle = i === 0 ? accent : '#f5f7f8';
+      ctx.font = '900 34px Arial, sans-serif';
+      ctx.fillText(m[1], x + 24, 494);
+    });
+
+    ctx.fillStyle = '#f5f7f8';
+    ctx.font = '800 23px Arial, sans-serif';
+    ctx.fillText('DEAL BREAKDOWN', 112, 596);
+
+    var rows = [
+      ['Buy price', C.money(result.buy)],
+      ['Expected sale', C.money(result.sale)],
+      ['Estimated fees', C.money(result.fees)],
+      ['Shipping', C.money(result.shipping)],
+      ['Other costs', C.money(result.other)]
+    ];
+    rows.forEach(function (row, i) {
+      var y = 644 + i * 55;
+      ctx.fillStyle = '#89939d';
+      ctx.font = '600 20px Arial, sans-serif';
+      ctx.fillText(row[0], 112, y);
+      ctx.fillStyle = '#f5f7f8';
+      ctx.font = '800 20px Arial, sans-serif';
+      ctx.textAlign = 'right';
+      ctx.fillText(row[1], 932, y);
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#283038';
+      ctx.fillRect(112, y + 18, 820, 1);
+    });
+
+    ctx.fillStyle = '#89939d';
+    ctx.font = '500 16px Arial, sans-serif';
+    ctx.fillText('Screening estimate — not a guarantee of profit.', 112, 958);
+    ctx.fillStyle = '#35e38b';
+    ctx.font = '700 16px Arial, sans-serif';
+    ctx.fillText('FLIP OR SKIP', 112, 992);
+
+    return canvas;
+  }
+
+  function shareFileFromCanvas(canvas) {
+    if (!canvas || !global.File || !global.atob) return null;
+    try {
+      var data = canvas.toDataURL('image/png');
+      var base64 = data.split(',')[1];
+      var binary = global.atob(base64);
+      var bytes = new Uint8Array(binary.length);
+      for (var i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+      return new global.File([bytes], 'flip-or-skip-breakdown.png', { type: 'image/png' });
+    } catch (_) {
+      return null;
+    }
+  }
+
+  function nativeShare(result, hint) {
+    var summary = buildShareText(result);
+    var nav = global.navigator || {};
+    var canvas = drawShareCard(result);
+    var file = shareFileFromCanvas(canvas);
+    var shareData = {
+      title: 'FLIP OR SKIP — ' + result.verdict,
+      text: summary
+    };
+    if (pageUrl()) shareData.url = pageUrl();
+
+    if (file && nav.canShare && nav.canShare({ files: [file] })) {
+      shareData.files = [file];
+    }
+
+    if (nav.share) {
+      setShareStatus(hint || 'Opening your share sheet…', 'working');
+      nav.share(shareData).then(function () {
+        setShareStatus('Shared successfully.', 'success');
+      }).catch(function (error) {
+        if (error && error.name === 'AbortError') {
+          setShareStatus('Share canceled.', '');
+          return;
+        }
+        setShareStatus('Your browser could not open the share sheet. Try Email or Save PNG.', 'error');
+      });
+      return true;
+    }
+    return false;
+  }
+
+  function savePng() {
+    var result = requireDeal();
+    if (!result) return;
+    var canvas = drawShareCard(result);
+    if (!canvas || !canvas.toDataURL) {
+      setShareStatus('PNG export is not supported by this browser.', 'error');
+      return;
+    }
+    var link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = 'flip-or-skip-breakdown.png';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    setShareStatus('PNG created. Check your downloads/files.', 'success');
+  }
+
+  function emailDeal() {
+    var result = requireDeal();
+    if (!result) return;
+    var subject = 'FLIP OR SKIP — ' + result.verdict + ' deal breakdown';
+    var body = buildShareText(result);
+    global.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    setShareStatus('Opening your email app with the deal summary.', 'working');
+  }
+
+  function textDeal() {
+    var result = requireDeal();
+    if (!result) return;
+    if (nativeShare(result, 'Choose Messages from the share sheet.')) return;
+
+    var summary = buildShareText(result);
+    var nav = global.navigator || {};
+    if (nav.clipboard && nav.clipboard.writeText) {
+      nav.clipboard.writeText(summary).then(function () {
+        setShareStatus('Summary copied. Opening Messages — paste it into your text.', 'success');
+        global.location.href = 'sms:';
+      }).catch(function () {
+        setShareStatus('Opening Messages. Use Email or Save PNG if you need the full summary.', '');
+        global.location.href = 'sms:';
+      });
+    } else {
+      setShareStatus('Opening Messages. Use Email or Save PNG if you need the full summary.', '');
+      global.location.href = 'sms:';
+    }
+  }
+
+  var shareBtn = $('shareBtn');
+  var emailBtn = $('emailBtn');
+  var textBtn = $('textBtn');
+  var savePngBtn = $('savePngBtn');
+  if (shareBtn) shareBtn.addEventListener('click', function () {
+    var result = requireDeal();
+    if (!result) return;
+    if (!nativeShare(result, 'Opening your share sheet…')) savePng();
+  });
+  if (emailBtn) emailBtn.addEventListener('click', emailDeal);
+  if (textBtn) textBtn.addEventListener('click', textDeal);
+  if (savePngBtn) savePngBtn.addEventListener('click', savePng);
+
   var savedTheme = safeStorageGet('flip-theme');
   if (savedTheme === 'light') document.documentElement.classList.add('light');
   render();
@@ -154,6 +395,7 @@
     });
     test('theme toggles', function () { var before = document.documentElement.classList.contains('light'); $('themeBtn').click(); assert(document.documentElement.classList.contains('light') !== before, 'theme did not toggle'); $('themeBtn').click(); });
     test('guide opens and closes', function () { $('guideBtn').click(); assert($('guide').hidden === false, 'guide did not open'); $('closeGuide').click(); assert($('guide').hidden === true, 'guide did not close'); });
+    test('share controls ready', function () { assert($('shareBtn') && $('emailBtn') && $('textBtn') && $('savePngBtn'), 'share controls missing'); });
     test('no horizontal overflow', function () { assert(document.documentElement.scrollWidth <= window.innerWidth + 1, 'horizontal overflow: ' + document.documentElement.scrollWidth + ' > ' + window.innerWidth); });
 
     var passed = results.filter(function (r) { return r.pass; }).length;
