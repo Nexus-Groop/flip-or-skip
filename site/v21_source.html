@@ -321,4 +321,241 @@ button.clear:hover{background:var(--panel2);color:var(--ink)}
 
     <div class="bottomStrip">
       <div class="strip"><div class="stripIcon">ϟ</div><div><strong>FAST DECISIONS</strong><span>Get an answer in seconds.</span></div></div>
-      <div class="strip"><div class="stripIcon">♢</div><div><strong>BUY SMARTER</strong><span>Avoid low-profit tra
+      <div class="strip"><div class="stripIcon">♢</div><div><strong>BUY SMARTER</strong><span>Avoid low-profit traps.</span></div></div>
+      <div class="strip"><div class="stripIcon">▥</div><div><strong>MAXIMIZE PROFIT</strong><span>Know your numbers.</span></div></div>
+      <div class="strip"><div class="stripIcon">□</div><div><strong>BUILT FOR RESELLERS</strong><span>Simple. Accurate. Effective.</span></div></div>
+    </div>
+  </main>
+
+  <footer class="foot"><span>↗ FLIP OR SKIP — Tools for smarter resellers.</span><span>This tool provides estimates only. Always verify fees and market value.</span></footer>
+</div>
+
+
+
+<div class="exportModal" id="exportModal" aria-hidden="true">
+  <div class="exportBox" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+    <div class="exportHead">
+      <h3 id="exportTitle">Deal Breakdown</h3>
+      <div class="exportActions">
+        <button type="button" id="closeExport">Close</button>
+        <button type="button" class="shareExport" id="shareExport">↗ Share</button>
+        <button type="button" class="saveExport" id="saveExport">↓ Save PNG</button>
+      </div>
+    </div>
+    <img class="exportPreview" id="exportPreview" alt="Flip or Skip deal breakdown preview">
+  </div>
+</div>
+
+<div class="guideOverlay" id="guideOverlay" aria-hidden="true">
+  <aside class="guideDrawer" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="guideHead">
+      <div>
+        <div class="guideKicker">30-second walkthrough</div>
+        <h2 id="guideTitle">How Flip or Skip works</h2>
+      </div>
+      <button class="closeGuide" id="closeGuide" type="button" aria-label="Close guide">×</button>
+    </div>
+
+    <p class="guideIntro">
+      Use this before buying a resale item. Enter what you expect to spend and what you realistically
+      expect to sell it for. Flip or Skip handles the math so you can make a faster decision.
+    </p>
+
+    <div class="guideStep"><div class="stepNum">1</div><div><h3>Enter your buy price</h3><p>What will the item actually cost you? This is required.</p></div></div>
+    <div class="guideStep"><div class="stepNum">2</div><div><h3>Enter the expected sale price</h3><p>Use a realistic selling price, not the highest price you hope to get.</p></div></div>
+    <div class="guideStep"><div class="stepNum">3</div><div><h3>Add known costs</h3><p>Shipping and other costs are optional, but they make the estimate more useful.</p></div></div>
+    <div class="guideStep"><div class="stepNum">4</div><div><h3>Set your target ROI</h3><p>Move the green slider to choose the return you want before buying.</p></div></div>
+    <div class="guideStep"><div class="stepNum">5</div><div><h3>Read the verdict</h3><p>BUY clears your target, CONSIDER is close, and SKIP misses it by more.</p></div></div>
+    <div class="guideStep"><div class="stepNum">6</div><div><h3>Share the breakdown</h3><p>Use Export Breakdown to create a clean deal card you can save or share.</p></div></div>
+
+    <div class="guideRule"><strong>Important:</strong> this is a screening tool, not a guarantee of profit. Verify condition, demand, actual fees and shipping before buying.</div>
+  </aside>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
+const num=id=>Math.max(0,Number($(id).value)||0);
+
+let pieFrame=0;
+let pieParts=[];
+function drawPie(parts){
+  pieParts=parts;
+  if(pieFrame)return;
+  pieFrame=requestAnimationFrame(()=>{
+    pieFrame=0;
+    const c=$('pie'),ctx=c.getContext('2d');
+    const rect=c.getBoundingClientRect();
+    const w=Math.max(1,Math.round(rect.width)),h=Math.max(1,Math.round(rect.height));
+    const d=Math.min(window.devicePixelRatio||1,2);
+    const targetW=Math.round(w*d),targetH=Math.round(h*d);
+    if(c.width!==targetW||c.height!==targetH){c.width=targetW;c.height=targetH;}
+    ctx.setTransform(d,0,0,d,0,0);
+    ctx.clearRect(0,0,w,h);
+    const vals=pieParts.map(x=>Math.max(0,x.value)),total=vals.reduce((a,b)=>a+b,0);
+    const cx=w/2,cy=h/2,r=Math.min(w,h)*.39;
+    if(total<=0){
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='#263136';ctx.fill();
+      ctx.fillStyle='#aab4b7';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('Enter numbers',cx,cy-2);ctx.fillText('to see chart',cx,cy+15);return;
+    }
+    let a=-Math.PI/2;
+    pieParts.forEach(p=>{
+      if(p.value<=0)return;
+      const b=a+(p.value/total)*Math.PI*2;
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a,b);ctx.closePath();ctx.fillStyle=p.color;ctx.fill();a=b;
+    });
+    ctx.beginPath();ctx.arc(cx,cy,r*.48,0,Math.PI*2);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--panel');ctx.fill();
+  });
+}
+
+function calc(){
+ const buy=num('buy'),sale=num('sale'),ship=num('shipping'),other=num('other');
+ let feePct=$('preset').value==='custom'?num('fee')/100:Number($('preset').value);
+ const target=num('target')/100;
+ const fees=sale*feePct, profit=sale-buy-ship-other-fees;
+ const roi=buy>0?profit/buy:0, margin=sale>0?profit/sale:0;
+
+ ['buy','sale'].forEach(id=>$(id).classList.toggle('inputAttention',num(id)<=0));
+
+ $('targetOut').textContent=(target*100).toFixed(0)+'%';
+ $('target').style.setProperty('--range-progress',(target*100)+'%');
+ const has=buy>0&&sale>0;
+ $('verdict').textContent=!has?'Enter your numbers':roi>=target?'BUY':roi>=target*.5?'CONSIDER':'SKIP';
+ $('signalSub').textContent=!has?'Fill in at least the buy price and expected sale price to see your result.':
+   roi>=target?'Above your target — the deal clears your threshold.':
+   roi>=target*.5?'Close to target — investigate the deal before buying.':
+   'Below your target — the numbers do not clear your threshold.';
+ $('verdictBox').classList.toggle('ok',has&&roi>=target);
+
+ $('profit').textContent=has?money(profit):'—';
+ $('roi').textContent=has?(roi*100).toFixed(1)+'%':'—';
+ $('margin').textContent=has?(margin*100).toFixed(1)+'%':'—';
+
+ $('lgProfit').textContent=has?money(Math.max(0,profit)):'—';
+ $('lgBuy').textContent=has?money(buy):'—';
+ $('lgFees').textContent=has?money(fees):'—';
+ $('lgShip').textContent=has?money(ship):'—';
+ $('lgOther').textContent=has?money(other):'—';
+ $('lgSale').textContent=has?money(sale):'—';
+
+ $('sSale').textContent=has?money(sale):'—';
+ $('sBuy').textContent=has?money(buy):'—';
+ $('sFees').textContent=has?money(fees):'—';
+ $('sShip').textContent=has?money(ship):'—';
+ $('sOther').textContent=has?money(other):'—';
+ $('sProfit').textContent=has?money(profit):'—';
+ $('sROI').textContent=has?(roi*100).toFixed(1)+'%':'—';
+ $('sMargin').textContent=has?(margin*100).toFixed(1)+'%':'—';
+
+ if(!has){
+   $('insight1').textContent='Is this a good deal? Enter your numbers to find out.';
+   $('insight2').textContent='How does it meet your ROI goal?';
+   $('insight3').textContent="What's the biggest cost?";
+   $('insight4').textContent='Tips to improve profitability.';
+ }else{
+   const costs=[['item cost',buy],['selling fees',fees],['shipping',ship],['other costs',other]].sort((a,b)=>b[1]-a[1]);
+   $('insight1').textContent=roi>=target?'This deal clears your target ROI.':`This deal is ${Math.max(0,(target-roi)*100).toFixed(1)} points below your target ROI.`;
+   $('insight2').textContent=`Your ROI is ${(roi*100).toFixed(1)}% against a ${(target*100).toFixed(0)}% goal.`;
+   $('insight3').textContent=`Your largest cost is ${costs[0][0]} at ${money(costs[0][1])}.`;
+   $('insight4').textContent=profit<0?'You are losing money at the expected sale price.':`You keep ${money(profit)} after the listed costs and fees.`;
+ }
+ drawPie([
+  {value:Math.max(0,profit),color:'#49df83'},
+  {value:buy,color:'#ff3d46'},
+  {value:fees,color:'#ff7b81'},
+  {value:ship,color:'#ffb4b8'},
+  {value:other,color:'#ffd5d8'}
+ ]);
+}
+
+['buy','sale','shipping','other'].forEach(id=>{
+  const el=$(id);
+  el.addEventListener('focus',()=>{
+    if(el.value==='0') el.value='';
+  });
+  el.addEventListener('input',calc);
+  el.addEventListener('blur',()=>{
+    if(el.value.trim()==='') el.value='';
+    calc();
+  });
+});
+$('preset').addEventListener('change',()=>{
+ $('feeCustom').style.display=$('preset').value==='custom'?'block':'none';calc();
+});
+$('fee').addEventListener('input',calc);$('target').addEventListener('input',calc);
+
+$('clear').addEventListener('click',()=>{
+ ['buy','sale','shipping','other'].forEach(id=>$(id).value='');calc();
+});
+
+
+$('exportBtn').addEventListener('click',()=>{
+ const buy=num('buy'),sale=num('sale'),ship=num('shipping'),other=num('other');
+ let feePct=$('preset').value==='custom'?num('fee')/100:Number($('preset').value);
+ const target=num('target')/100,fees=sale*feePct;
+ const profit=sale-buy-ship-other-fees,roi=buy>0?profit/buy:0,margin=sale>0?profit/sale:0;
+ if(!(buy>0&&sale>0)){
+   alert('Enter a buy price and expected sale price first.');
+   return;
+ }
+ const c=document.createElement('canvas'),ctx=c.getContext('2d');
+ c.width=1400;c.height=900;
+ const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#070b0d';
+ const panel=getComputedStyle(document.documentElement).getPropertyValue('--panel').trim()||'#0d1417';
+ const ink=getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#f4f6f5';
+ const muted=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#9aa6aa';
+ const green='#49df83',red='#ff3d46';
+ ctx.fillStyle=bg;ctx.fillRect(0,0,c.width,c.height);
+ ctx.fillStyle=panel;roundRect(ctx,55,55,1290,790,24);ctx.fill();
+ ctx.strokeStyle='#29353a';ctx.lineWidth=2;ctx.stroke();
+ ctx.fillStyle=green;ctx.font='900 30px Arial';ctx.fillText('FLIP',85,115);
+ ctx.fillStyle=ink;ctx.fillText(' OR ',175,115);
+ ctx.fillStyle=red;ctx.fillText('SKIP',250,115);
+ ctx.fillStyle=muted;ctx.font='600 17px Arial';ctx.fillText('DEAL BREAKDOWN',85,150);
+ ctx.fillStyle=ink;ctx.font='500 48px Georgia';
+ ctx.fillText(roi>=target?'BUY':roi>=target*.5?'CONSIDER':'SKIP',85,225);
+ ctx.fillStyle=muted;ctx.font='18px Arial';ctx.fillText(`Target ROI: ${(target*100).toFixed(0)}%`,85,260);
+
+ const metrics=[
+  ['EXPECTED SALE',money(sale)],
+  ['EST. PROFIT',money(profit)],
+  ['ROI',(roi*100).toFixed(1)+'%'],
+  ['PROFIT MARGIN',(margin*100).toFixed(1)+'%']
+ ];
+ metrics.forEach((m,i)=>{
+   const x=85+i*300;
+   ctx.fillStyle='#111a1e';roundRect(ctx,x,305,270,120,14);ctx.fill();
+   ctx.fillStyle=muted;ctx.font='700 12px Arial';ctx.fillText(m[0],x+18,335);
+   ctx.fillStyle=i===1&&profit>=0?green:i===1?red:ink;ctx.font='800 27px Arial';ctx.fillText(m[1],x+18,382);
+ });
+ ctx.fillStyle=ink;ctx.font='800 17px Arial';ctx.fillText('COST BREAKDOWN',85,485);
+ const parts=[
+  ['Your Profit',Math.max(0,profit),green],
+  ['Item Cost',buy,red],
+  ['Selling Fees',fees,'#ff7b81'],
+  ['Shipping',ship,'#ffb4b8'],
+  ['Other Costs',other,'#ffd5d8']
+ ];
+ const total=parts.reduce((a,x)=>a+x[1],0);
+ let angle=-Math.PI/2,cx=235,cy=650,r=125;
+ if(total>0) parts.forEach(p=>{
+   if(p[1]<=0)return;
+   const next=angle+(p[1]/total)*Math.PI*2;
+   ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,angle,next);ctx.closePath();ctx.fillStyle=p[2];ctx.fill();angle=next;
+ });
+ ctx.fillStyle=panel;ctx.beginPath();ctx.arc(cx,cy,62,0,Math.PI*2);ctx.fill();
+ parts.forEach((p,i)=>{
+   const x=450,y=535+i*52;
+   ctx.fillStyle=p[2];ctx.beginPath();ctx.arc(x,y-5,7,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle=muted;ctx.font='600 16px Arial';ctx.fillText(p[0],x+18,y);
+   ctx.fillStyle=ink;ctx.font='700 16px Arial';ctx.fillText(money(p[1]),x+205,y);
+ });
+ ctx.strokeStyle='#29353a';ctx.beginPath();ctx.moveTo(85,800);ctx.lineTo(1315,800);ctx.stroke();
+ ctx.fillStyle=muted;ctx.font='12px Arial';ctx.fillText('Estimates only — verify actual fees, shipping and market value before buying.',85,827);
+ const png=c.toDataURL('image/png');
+ const exportModal=$('exportModal'),exportPreview=$('exportPreview');
+ exportPreview.src=png;
+ exportModal.classList.add('open');exportModal.setAttribute('aria-hidden','false');
+ $('saveExport').onclick=()=>{
+   const a=document.createElement('a');a.href=png;a.download='flip-or-skip-breakdown.png';a.style.display='none';
+   document
