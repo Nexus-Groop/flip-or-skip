@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#090b0d">
+  <meta name="description" content="FLIP OR SKIP reseller deal calculator.">
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="../shared/styles.css">
+  <title>FLIP OR SKIP — Desktop</title>
+</head>
+<body data-layout="desktop">
+<main class="shell">
+  <header class="topbar">
+    <div class="brand">FLIP <span>OR</span> SKIP</div>
+    <div class="actions">
+      <button class="btn" id="guideBtn" type="button">Quick Guide</button>
+      <button class="btn" id="themeBtn" type="button">Light / Dark</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Reseller decision tool</div>
+    <h1>Run the numbers before you buy.</h1>
+    <p>Fast, simple, and built for resellers. Know your estimated profit before your money leaves your pocket.</p>
+  </section>
+
+  <div class="grid">
+    <form class="card" id="dealForm" novalidate>
+      <div class="section-head"><h2>1. The Deal</h2><button class="help" type="button" data-help="dealHelp" aria-expanded="false" aria-label="Explain The Deal">?</button></div>
+      <div class="helpbox" id="dealHelp" hidden>Enter what you expect to pay and what you realistically expect to sell it for. Shipping and other costs are optional.</div>
+      <div class="fields">
+        <div class="field"><label for="buy">Buy price</label><input id="buy" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" autocomplete="off"></div>
+        <div class="field"><label for="sale">Expected sale</label><input id="sale" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" autocomplete="off"></div>
+        <div class="field"><label for="shipping">Shipping <span class="optional">(optional)</span></label><input id="shipping" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" autocomplete="off"></div>
+        <div class="field"><label for="other">Other costs <span class="optional">(optional)</span></label><input id="other" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" autocomplete="off"></div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2>2. Fees &amp; Target</h2><button class="help" type="button" data-help="feeHelp" aria-expanded="false" aria-label="Explain Fees and Target">?</button></div>
+      <div class="helpbox" id="feeHelp" hidden>Marketplace rates are screening estimates, not a promise of your exact payout. Platform fees can vary by category, order details, seller status, payment processing, shipping, and promotions.</div>
+      <div class="field"><label for="marketplace">Selling platform</label>
+        <select id="marketplace">
+          <option value="ebay">eBay — 13.6% + $0.40 est.</option>
+          <option value="poshmark">Poshmark — 20% / $2.95 under $15</option>
+          <option value="mercari">Mercari — 10% est.</option>
+          <option value="facebook">Facebook Marketplace — 10% shipped est.</option>
+          <option value="whatnot">Whatnot — 8% est.</option>
+          <option value="depop">Depop — 0% selling fee</option>
+          <option value="etsy">Etsy — 6.5% transaction fee</option>
+          <option value="amazon">Amazon — 15% + $0.30 est.</option>
+          <option value="custom">Custom</option>
+        </select>
+      </div>
+      <div class="field custom" id="customFeeWrap" hidden>
+        <label for="customRate">Custom selling fee (%)</label>
+        <input id="customRate" inputmode="decimal" type="number" min="0" max="100" step="0.1" placeholder="0.0" autocomplete="off">
+        <label for="customFixed" style="margin-top:10px">Custom fixed fee ($) <span class="optional">(optional)</span></label>
+        <input id="customFixed" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" autocomplete="off">
+      </div>
+
+      <div class="targetRow">
+        <div class="targetTop"><span>Target ROI</span><span class="targetOut" id="targetOut">40.0%</span></div>
+        <input class="range" id="target" type="range" min="10" max="100" step="1" value="40" aria-label="Target ROI">
+        <div class="rangeHint"><span>10%</span><span>100%</span></div>
+      </div>
+      <div class="bottom"><small>Screening estimate — not a profit guarantee.</small><button class="btn" type="button" id="clearBtn">Clear</button></div>
+    </form>
+
+    <section class="card" aria-live="polite">
+      <div class="section-head"><h2>Verdict</h2><button class="help" type="button" data-help="verdictHelp" aria-expanded="false" aria-label="Explain Verdict">?</button></div>
+      <div class="helpbox" id="verdictHelp" hidden>BUY means the calculated ROI meets your target. CONSIDER means it is at least halfway to your target. SKIP falls below that.</div>
+      <div class="verdict" id="verdictBox" data-verdict="enter-numbers"><strong id="verdict">ENTER NUMBERS</strong><span id="feeRate">13.6%</span></div>
+      <div class="metricGrid">
+        <div class="metric"><small>Profit</small><strong id="profit">—</strong></div>
+        <div class="metric"><small>ROI</small><strong id="roi">—</strong></div>
+        <div class="metric"><small>Margin</small><strong id="margin">—</strong></div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2>Cost Breakdown</h2><button class="help" type="button" data-help="chartHelp" aria-expanded="false" aria-label="Explain Cost Breakdown">?</button></div>
+      <div class="helpbox" id="chartHelp" hidden>The chart separates the expected sale into your item and other costs, estimated platform fees, and profit.</div>
+      <div class="chartWrap">
+        <div class="donut" id="donut"><div class="donutCenter" id="donutCenter">—</div></div>
+        <div class="breakdown">
+          <div class="row"><span><i class="dot"></i>Profit</span><strong id="profitBreak">—</strong></div>
+          <div class="row"><span><i class="dot red"></i>Item + costs</span><strong id="costSummary">—</strong></div>
+          <div class="row"><span><i class="dot soft"></i>Fees</span><strong id="feeSummary">—</strong></div>
+          <div class="row"><span>Expected sale</span><strong id="saleSummary">—</strong></div>
+        </div>
+      </div>
+
+      <div class="section-head" style="margin-top:24px"><h2>Quick Insights</h2><button class="help" type="button" data-help="insightHelp" aria-expanded="false" aria-label="Explain Quick Insights">?</button></div>
+      <div class="helpbox" id="insightHelp" hidden>These are simple screening observations based only on the numbers you entered.</div>
+      <div class="insights"><div class="insight" id="insightFee">Enter a buy and sale price to see the fee impact.</div><div class="insight" id="insightBreakEven">Your break-even sale price will appear here.</div></div>
+    </section>
+  </div>
+</main>
+
+<div class="modal" id="guide" hidden aria-hidden="true">
+  <div class="modal-backdrop" id="guideBackdrop"></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <h2 id="guideTitle">Quick Guide</h2>
+    <p>Enter your buy price and expected sale price. Add shipping or other costs if they apply. Pick a marketplace, set the ROI you want, then use the verdict to screen the deal.</p>
+    <p>The calculator is a screening estimate, not a guarantee of profit.</p>
+    <button class="btn primary" id="closeGuide" type="button">Got it</button>
+  </div>
+</div>
+<div class="self-test" id="selfTest" hidden></div>
+<script src="../shared/calculator.js"></script>
+<script src="../shared/app.js"></script>
+</body>
+</html>
