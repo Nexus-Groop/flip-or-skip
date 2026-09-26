@@ -4,8 +4,9 @@
   "private": true,
   "description": "FLIP OR SKIP reseller deal calculator",
   "scripts": {
-    "test": "npm run test:calculator && npm run test:controller",
+    "test": "npm run test:v21 && npm run test:calculator && npm run test:controller",
     "test:calculator": "cd tests && node test_calculator.js",
-    "test:controller": "cd tests && node test_app_controller.js"
+    "test:controller": "cd tests && node test_app_controller.js",
+    "test:v21": "node tests/test_v21_baseline.js"
   }
 }
