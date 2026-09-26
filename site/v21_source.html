@@ -558,4 +558,100 @@ $('exportBtn').addEventListener('click',()=>{
  exportModal.classList.add('open');exportModal.setAttribute('aria-hidden','false');
  $('saveExport').onclick=()=>{
    const a=document.createElement('a');a.href=png;a.download='flip-or-skip-breakdown.png';a.style.display='none';
-   document
+   document.body.appendChild(a);a.click();a.remove();
+ };
+$('shareExport').onclick=async()=>{
+   try{
+     const res=await fetch(png);
+     const blob=await res.blob();
+     const file=new File([blob],'flip-or-skip-breakdown.png',{type:'image/png'});
+     if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+       await navigator.share({title:'Flip or Skip Deal Breakdown',text:'Here is the deal breakdown.',files:[file]});
+     }else if(navigator.share){
+       await navigator.share({title:'Flip or Skip Deal Breakdown',text:'Here is the deal breakdown.'});
+     }else{
+       $('saveExport').click();
+     }
+   }catch(err){
+     if(err && err.name!=='AbortError') $('saveExport').click();
+   }
+ };
+
+});
+function roundRect(ctx,x,y,w,h,r){
+ ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+
+
+const exportModal=$('exportModal');
+$('closeExport').addEventListener('click',()=>{exportModal.classList.remove('open');exportModal.setAttribute('aria-hidden','true');});
+exportModal.addEventListener('click',e=>{if(e.target===exportModal){exportModal.classList.remove('open');exportModal.setAttribute('aria-hidden','true');}});
+
+const guideOverlay = $('guideOverlay');
+const guideBtn = $('guideBtn');
+const closeGuide = $('closeGuide');
+
+function openGuide(){
+  guideOverlay.classList.add('open');
+  guideOverlay.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+}
+function closeGuidePanel(){
+  guideOverlay.classList.remove('open');
+  guideOverlay.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+}
+guideBtn.addEventListener('click', openGuide);
+closeGuide.addEventListener('click', closeGuidePanel);
+guideOverlay.addEventListener('click', (e)=>{
+  if(e.target === guideOverlay) closeGuidePanel();
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape' && guideOverlay.classList.contains('open')) closeGuidePanel();
+  if(e.key === 'Escape' && exportModal.classList.contains('open')) { exportModal.classList.remove('open'); exportModal.setAttribute('aria-hidden','true'); }
+});
+
+$('themeBtn').addEventListener('click',()=>{
+ const dark=document.documentElement.getAttribute('data-theme')!=='light';
+ document.documentElement.setAttribute('data-theme',dark?'light':'dark');
+ $('themeBtn').textContent=dark?'☾ Dark Mode':'☀ Light Mode';
+ drawPie([
+  {value:0,color:'#49df83'},{value:0,color:'#ff3d46'},{value:0,color:'#ff7b81'}
+ ]);
+ calc();
+});
+
+let resizeTimer;
+window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{drawPie(pieParts);},120)},{passive:true});
+calc();
+</script>
+
+<script id="help-v17-js">
+document.addEventListener('click',function(e){
+  const b=e.target.closest('.panel-help-btn');
+  if(!b)return;
+  const key=b.getAttribute('data-help-key');
+  const p=document.querySelector('[data-panel-help="'+key+'"]');
+  if(!p)return;
+  const was=p.classList.contains('open');
+  document.querySelectorAll('.panel-help.open').forEach(x=>x.classList.remove('open'));
+  if(!was)p.classList.add('open');
+});
+</script>
+
+
+<script id="info-help-v19-js">
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.info-help-btn');
+  if(!btn)return;
+  const key=btn.getAttribute('data-info-help');
+  const panel=document.querySelector('[data-info-panel="'+key+'"]');
+  if(!panel)return;
+  const was=panel.classList.contains('open');
+  document.querySelectorAll('.info-help-panel.open').forEach(p=>p.classList.remove('open'));
+  if(!was)panel.classList.add('open');
+});
+</script>
+
+</body>
+</html>
