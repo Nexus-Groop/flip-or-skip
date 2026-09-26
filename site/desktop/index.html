@@ -1,141 +1,657 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#090b0d">
-  <meta name="description" content="FLIP OR SKIP reseller deal calculator.">
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="../shared/styles.css">
-  <title>FLIP OR SKIP — Desktop</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flip or Skip — Reseller Calculator</title>
+<style>
+:root{
+ --bg:#070b0d;--panel:#0d1417;--panel2:#111a1e;--ink:#f4f6f5;--muted:#9aa6aa;
+ --line:#29353a;--green:#49df83;--green2:#20b963;--red:#ff3d46;--red2:#ff7b81;
+ --white:#fff;--input:#0a1114;--shadow:0 18px 50px rgba(0,0,0,.28);
+}
+[data-theme="light"]{
+ --bg:#f4f6f5;--panel:#fff;--panel2:#f0f3f2;--ink:#101817;--muted:#64716f;
+ --line:#dce3e0;--green:#129b4e;--green2:#087d3b;--red:#d92d38;--red2:#b91f29;
+ --input:#fff;--shadow:0 18px 50px rgba(20,30,25,.08);
+}
+*{box-sizing:border-box}
+html{background:var(--bg);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;transition:.2s;min-width:0;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+.wrap{max-width:1220px;margin:auto;padding:22px 24px 42px}
+.nav{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:18px}
+.brand{display:flex;align-items:center;gap:12px;font-size:23px;font-weight:950;letter-spacing:-1px}
+.brand .g{color:var(--green)}.brand .r{color:var(--red)}
+.mark{font-size:24px;color:var(--green)}
+.navright{display:flex;align-items:center;gap:10px}
+.tab{font-size:12px;color:var(--muted);font-weight:800;padding:9px 10px}
+.tab.active{color:var(--green);border-bottom:2px solid var(--green)}
+.theme{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;padding:7px 12px;font-size:11px;font-weight:850;cursor:pointer}
+.hero{display:flex;justify-content:space-between;align-items:end;gap:25px;padding:34px 2px 28px}
+.hero h1{font-family:Georgia,serif;font-weight:500;font-size:clamp(42px,6vw,62px);line-height:.95;margin:0;letter-spacing:-2px}
+.hero p{color:var(--muted);margin:12px 0 0;font-size:15px}
+.quote{font-family:Georgia,serif;font-style:italic;color:var(--muted);font-size:15px;text-align:right;max-width:300px}
+.gridtop{display:grid;grid-template-columns:1fr .78fr 1.1fr;gap:14px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:21px;box-shadow:var(--shadow)}
+.panelTitle{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:900;letter-spacing:.04em;text-transform:uppercase}
+.panelTitle .icon{font-size:21px;color:var(--green)}
+.panelSub{font-size:12px;color:var(--muted);margin:5px 0 18px 31px}
+label{display:block;color:var(--muted);font-size:11px;font-weight:800;margin:13px 0 6px}
+label.req:after{content:" *";color:var(--red)}
+input,select{width:100%;height:46px;border:1px solid var(--line);border-radius:7px;background:var(--input);color:var(--ink);padding:0 11px;font-size:14px;outline:none}
+.percent{position:relative}.percent:after{content:"%";position:absolute;right:12px;top:12px;color:var(--muted);font-weight:800;pointer-events:none}.percent input{padding-right:30px}
+input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(73,223,131,.1)}
+.money{position:relative}.money:before{content:"$";position:absolute;left:11px;top:12px;color:var(--muted);font-weight:800}.money input{padding-left:25px}.money input::placeholder{color:var(--muted);opacity:.72}
+.inputAttention{border-color:var(--red)!important;color:var(--red2)!important;background:rgba(255,61,70,.045)!important}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.hint{font-size:10px;color:var(--muted);margin-top:5px}
+.rangeRow{display:grid;grid-template-columns:1fr 65px;gap:10px;align-items:center}
+input[type=range]{
+ width:100%;height:34px;padding:0;border:0;border-radius:999px;
+ background:linear-gradient(to right,var(--green) 0%,var(--green) var(--range-progress,20%),var(--line) var(--range-progress,20%),var(--line) 100%);
+ accent-color:var(--green);cursor:pointer;appearance:none;-webkit-appearance:none;touch-action:pan-y;
+padding:0;border:0;border-radius:999px;
+ background:linear-gradient(to right,var(--green) 0%,var(--green) var(--range-progress,20%),var(--line) var(--range-progress,20%),var(--line) 100%);
+ accent-color:var(--green);cursor:pointer;appearance:none;
+}
+input[type=range]::-webkit-slider-runnable-track{height:8px;border-radius:999px;background:transparent}
+input[type=range]::-webkit-slider-thumb{
+ appearance:none;-webkit-appearance:none;width:24px;height:24px;margin-top:-8px;border-radius:50%;
+ background:var(--green);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--green);
+ cursor:pointer;
+}
+input[type=range]::-moz-range-track{height:8px;border-radius:999px;background:var(--line)}
+input[type=range]::-moz-range-progress{height:8px;border-radius:999px;background:var(--green)}
+input[type=range]::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:var(--green);border:3px solid var(--bg);box-shadow:0 0 0 2px var(--green);cursor:pointer}
+.rangeVal{font-weight:950;text-align:center;border:1px solid var(--green);border-radius:7px;padding:9px 4px;color:var(--green);background:rgba(73,223,131,.07)}
+.advanced{margin-top:16px;border:1px solid var(--line);border-radius:7px;padding:10px 12px;color:var(--muted);font-size:11px;font-weight:800}
+.verdictPanel{border-color:var(--green);box-shadow:0 0 0 1px rgba(73,223,131,.1),var(--shadow)}
+.verdict{border:1px solid rgba(255,61,70,.35);background:rgba(255,61,70,.06);border-radius:9px;padding:26px 14px;text-align:center;margin-top:16px}
+.verdict.ok{border-color:rgba(73,223,131,.4);background:rgba(73,223,131,.06)}
+.verdict h2{font-family:Georgia,serif;font-size:31px;font-weight:500;margin:0}
+.verdict p{margin:8px 0 0;color:var(--muted);font-size:12px}
+.metrics3{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--line);margin-top:18px}
+.m3{padding:14px 9px;text-align:center;border-right:1px solid var(--line)}.m3:last-child{border:0}
+.m3 span{display:block;color:var(--muted);font-size:9px;font-weight:850;text-transform:uppercase;letter-spacing:.06em}
+.m3 strong{display:block;font-size:18px;margin-top:6px}
+.bottom{display:grid;grid-template-columns:1.05fr .95fr .75fr;gap:14px;margin-top:14px}
+.chartWrap{display:flex;align-items:center;gap:20px;min-height:250px}
+canvas{width:190px!important;height:190px!important}
+.legend{display:grid;gap:9px;flex:1}
+.leg{display:flex;justify-content:space-between;gap:15px;font-size:11px;color:var(--muted)}
+.dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:7px}
+.summary{display:grid;gap:13px;margin-top:15px}
+.sumrow{display:flex;justify-content:space-between;color:var(--muted);font-size:12px}
+.sumrow strong{color:var(--ink)}
+.sumrow.total{border-top:1px solid var(--line);padding-top:13px;color:var(--ink);font-weight:900}
+.insights{display:grid;gap:12px;margin-top:17px}
+.insight{display:flex;gap:11px;align-items:start;color:var(--muted);font-size:11px;line-height:1.4}
+.insight b{color:var(--green);font-size:17px;line-height:1}
+.bottomStrip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:18px;padding:18px 0}
+.strip{display:flex;gap:11px;align-items:center;padding:0 18px;border-right:1px solid var(--line)}.strip:last-child{border:0}
+.stripIcon{font-size:20px;color:var(--muted)}.strip strong{font-size:11px;display:block}.strip span{font-size:10px;color:var(--muted)}
+.foot{display:flex;justify-content:space-between;color:var(--muted);font-size:9px;padding-top:18px}
+button.clear,button.export{
+ width:100%;height:39px;margin-top:14px;border:1px solid var(--line);border-radius:7px;
+ background:transparent;color:var(--muted);font-weight:800;cursor:pointer
+}
+button.export{background:var(--green);border-color:var(--green);color:#06110b;margin-top:10px}
+button.export:hover{filter:brightness(1.06)}
+button.clear:hover{background:var(--panel2);color:var(--ink)}
+button.clear:hover{background:var(--panel2);color:var(--ink)}
+@media(max-width:950px){.gridtop{grid-template-columns:1fr 1fr}.verdictPanel{grid-column:1/-1}.bottom{grid-template-columns:1fr 1fr}.bottom .panel:last-child{grid-column:1/-1}.hero{display:block}.quote{text-align:left;margin-top:15px}}
+@media(max-width:650px){.wrap{padding:14px 12px 28px}.navright .tab{display:none}.hero{padding-top:23px}.hero h1{font-size:clamp(38px,12vw,52px)}.gridtop,.bottom{grid-template-columns:1fr}.verdictPanel,.bottom .panel:last-child{grid-column:auto}.row2{grid-template-columns:1fr}.bottomStrip{grid-template-columns:1fr 1fr;gap:10px}.strip:nth-child(2){border:0}.strip{padding:7px 6px;min-width:0}}
+
+@media(max-width:420px){
+  .panel{padding:17px;border-radius:11px}
+  .panelSub{margin-left:0}
+  .rangeRow{grid-template-columns:minmax(0,1fr) 58px;gap:9px}
+  .rangeVal{padding:8px 3px}
+  .verdict{padding:23px 12px}
+  .verdict h2{font-size:29px}
+  .metrics3{margin-top:15px}
+  .m3{padding:12px 4px}
+  .m3 strong{font-size:16px}
+  .chartWrap{gap:12px;min-height:220px}
+  canvas{width:155px!important;height:155px!important}
+  .legend{gap:7px}
+  .leg{font-size:10px}
+  .nav{padding-bottom:14px}
+  .brand{font-size:21px}
+  .theme{padding:8px 10px}
+  input,select{font-size:16px}
+}
+
+.guideBtn{
+  border:0;background:transparent;cursor:pointer;font:inherit;
+}
+.guideOverlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.58);backdrop-filter:blur(4px);
+  opacity:0;visibility:hidden;transition:.2s;z-index:9999;
+}
+.guideOverlay.open{opacity:1;visibility:visible}
+.guideDrawer{
+  position:absolute;top:0;right:0;height:100%;width:min(470px,92vw);
+  background:var(--panel);border-left:1px solid var(--line);
+  box-shadow:-25px 0 70px rgba(0,0,0,.3);
+  transform:translateX(100%);transition:transform .25s ease;
+  overflow:auto;padding:27px;
+}
+.guideOverlay.open .guideDrawer{transform:translateX(0)}
+.guideHead{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  border-bottom:1px solid var(--line);padding-bottom:18px;
+}
+.guideKicker{color:var(--green);font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+.guideHead h2{font-family:Georgia,serif;font-size:31px;font-weight:500;margin:7px 0 0}
+.closeGuide{
+  width:34px;height:34px;border:1px solid var(--line);background:transparent;color:var(--muted);
+  border-radius:8px;font-size:21px;cursor:pointer;line-height:1;
+}
+.closeGuide:hover{background:var(--panel2);color:var(--ink)}
+.guideIntro{color:var(--muted);font-size:13px;line-height:1.55;margin:18px 0 22px}
+.guideStep{display:grid;grid-template-columns:35px 1fr;gap:13px;padding:16px 0;border-bottom:1px solid var(--line)}
+.stepNum{
+  width:30px;height:30px;border-radius:50%;display:grid;place-items:center;
+  background:rgba(73,223,131,.1);color:var(--green);font-weight:950;font-size:12px;
+  border:1px solid rgba(73,223,131,.35)
+}
+.guideStep h3{font-size:13px;margin:0 0 5px}
+.guideStep p{font-size:11px;line-height:1.55;color:var(--muted);margin:0}
+.guideRule{
+  margin-top:20px;padding:14px;border:1px solid var(--line);border-radius:9px;
+  background:var(--panel2);font-size:11px;color:var(--muted);line-height:1.5
+}
+.guideRule strong{color:var(--ink)}
+
+
+.exportModal{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:24px;z-index:1000}
+.exportModal.open{display:flex}
+.exportBox{width:min(920px,96vw);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 24px 80px rgba(0,0,0,.45)}
+.exportHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.exportHead h3{margin:0;font-size:16px}.exportActions{display:flex;gap:9px}.exportActions button{border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:9px;padding:9px 13px;font-weight:800;cursor:pointer}.exportActions .shareExport{background:var(--panel2);color:var(--ink);border-color:var(--line)}
+.exportActions .saveExport{background:var(--green);color:#06100a;border-color:var(--green)}
+.exportPreview{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line);background:#070b0d}
+</style>
+
+<style id="help-v17">
+.panel-title-help{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%}
+.panel-help-btn{width:30px;height:30px;min-width:30px;border-radius:50%;border:1px solid var(--green);background:rgba(70,220,130,.12);color:var(--green);font-weight:900;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 0 3px rgba(70,220,130,.06);transition:.15s}
+.panel-help-btn:hover{background:rgba(70,220,130,.22);transform:scale(1.06)}
+.panel-help{display:none;margin:10px 0 16px;padding:14px 15px;border:1px solid rgba(70,220,130,.45);border-radius:12px;background:var(--panel2)}
+.panel-help.open{display:block}
+.panel-help h4{margin:0 0 7px;color:var(--ink);font-size:13px}
+.panel-help p{margin:0 0 8px;color:var(--muted);font-size:11px;line-height:1.5}
+.panel-help p:last-child{margin-bottom:0}
+.panel-help strong{color:var(--ink)}
+.panel-help .example{border-left:2px solid var(--green);padding-left:10px}
+</style>
+
+
+<style id="info-help-v19">
+.info-title-help{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%}
+.info-help-btn{width:30px;height:30px;min-width:30px;border-radius:50%;border:1px solid var(--green);background:rgba(70,220,130,.12);color:var(--green);font-weight:900;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 0 3px rgba(70,220,130,.06);transition:.15s}
+.info-help-btn:hover{background:rgba(70,220,130,.22);transform:scale(1.06)}
+.info-help-panel{display:none;margin:10px 0 14px;padding:13px 14px;border:1px solid rgba(70,220,130,.40);border-radius:12px;background:var(--panel2)}
+.info-help-panel.open{display:block}
+.info-help-panel p{margin:0;color:var(--muted);font-size:11px;line-height:1.5}
+</style>
+
 </head>
-<body data-layout="desktop">
-<main class="shell">
-  <header class="topbar">
-    <div class="brand">FLIP <span>OR</span> SKIP</div>
-    <div class="actions">
-      <button class="btn" id="guideBtn" type="button">Quick Guide</button>
-      <button class="btn" id="themeBtn" type="button">Light / Dark</button>
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <div class="brand"><span class="mark">↗</span><span><span class="g">FLIP</span> OR <span class="r">SKIP</span></span></div>
+    <div class="navright">
+      <div class="tab active">▣ Calculator</div>
+      <button class="tab guideBtn" id="guideBtn" type="button">▢ Quick Guide</button>
+      <button class="theme" id="themeBtn">☀ Light Mode</button>
     </div>
+  </nav>
+
+  <header class="hero">
+    <div><h1>Should You Flip It?</h1><p>Run the numbers before you buy. Fast, simple, and built for resellers.</p></div>
+    <div class="quote">“Know the numbers before you spend the money.”<br>────────</div>
   </header>
 
-  <section class="hero">
-    <div class="eyebrow">Reseller decision tool</div>
-    <h1>Run the numbers before you buy.</h1>
-    <p>Fast, simple, and built for resellers. Know your estimated profit before your money leaves your pocket.</p>
-  </section>
+  <main>
+    <div class="gridtop">
+      <section class="panel">
+        <div class="panel-title-help"><div class="panelTitle"><span class="icon">🛒</span> 1. The Deal</div><button type="button" class="panel-help-btn" data-help-key="deal" aria-label="Explain The Deal">?</button></div><div class="panel-help" data-panel-help="deal">
+<h4>The Deal — what goes here?</h4>
+<p><strong>Buy Price:</strong> what you will actually pay for the item.</p>
+<p><strong>Expected Sale:</strong> what you realistically think the item will sell for. Recent sold prices are better than the highest asking price you see.</p>
+<p><strong>Shipping:</strong> what you expect to spend sending the item to the buyer. Leave it at $0 if you don't know yet.</p>
+<p><strong>Other Costs:</strong> extra costs connected to the flip, such as packaging, cleaning, repairs, or replacement parts.</p>
+<p class="example"><strong>Example:</strong> You find a game for $20 and realistically expect to sell it for $50. Enter $20 for Buy Price, $50 for Expected Sale, and your estimated shipping cost.</p>
+</div>
+        <div class="panelSub">Start with the basics.</div>
+        <div class="row2">
+          <div><label class="req">What are you paying?</label><div class="money"><input id="buy" type="number" min="0" step=".01" value="" placeholder="0.00"></div></div>
+          <div><label class="req">Expected sale price?</label><div class="money"><input id="sale" type="number" min="0" step=".01" value="" placeholder="0.00"></div></div>
+        </div>
+        <div class="row2">
+          <div><label>Shipping cost <span style="font-weight:500">(optional)</span></label><div class="money"><input id="shipping" type="number" min="0" step=".01" value="" placeholder="0.00"></div><div class="hint">e.g. $5.00</div></div>
+          <div><label>Other costs <span style="font-weight:500">(optional)</span></label><div class="money"><input id="other" type="number" min="0" step=".01" value="" placeholder="0.00"></div><div class="hint">e.g. packaging, supplies, etc.</div></div>
+        </div>
+        <button class="clear" id="clear">Clear inputs</button>
+      </section>
 
-  <div class="grid">
-    <form class="card" id="dealForm" novalidate>
-      <div class="section-head"><h2>1. The Deal</h2><button class="help" type="button" data-help="dealHelp" aria-expanded="false" aria-label="Explain The Deal">?</button></div>
-      <div class="helpbox" id="dealHelp" hidden>Enter what you expect to pay and what you realistically expect to sell it for. Shipping and other costs are optional.</div>
-      <div class="fields">
-        <div class="field"><label for="buy">Buy price</label><input id="buy" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" autocomplete="off"></div>
-        <div class="field"><label for="sale">Expected sale</label><input id="sale" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" autocomplete="off"></div>
-        <div class="field"><label for="shipping">Shipping <span class="optional">(optional)</span></label><input id="shipping" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" autocomplete="off"></div>
-        <div class="field"><label for="other">Other costs <span class="optional">(optional)</span></label><input id="other" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" autocomplete="off"></div>
-      </div>
-
-      <div class="section-head" style="margin-top:24px"><h2>2. Fees &amp; Target</h2><button class="help" type="button" data-help="feeHelp" aria-expanded="false" aria-label="Explain Fees and Target">?</button></div>
-      <div class="helpbox" id="feeHelp" hidden>Marketplace rates are screening estimates, not a promise of your exact payout. Platform fees can vary by category, order details, seller status, payment processing, shipping, and promotions.</div>
-      <div class="field"><label for="marketplace">Selling platform</label>
-        <select id="marketplace">
-          <option value="ebay">eBay — 13.6% + $0.40 est.</option>
-          <option value="poshmark">Poshmark — 20% / $2.95 under $15</option>
-          <option value="mercari">Mercari — 10% est.</option>
-          <option value="facebook">Facebook Marketplace — 10% shipped est.</option>
-          <option value="whatnot">Whatnot — 8% est.</option>
-          <option value="depop">Depop — 0% selling fee</option>
-          <option value="etsy">Etsy — 6.5% transaction fee</option>
-          <option value="amazon">Amazon — 15% + $0.30 est.</option>
+      <section class="panel">
+        <div class="panel-title-help"><div class="panelTitle"><span class="icon">⚙</span> 2. Fees & Target</div><button type="button" class="panel-help-btn" data-help-key="fees" aria-label="Explain Fees and Target">?</button></div><div class="panel-help" data-panel-help="fees">
+<h4>Fees & Target — what do these mean?</h4>
+<p><strong>Marketplace Fee:</strong> the percentage of the sale that the selling platform takes. Use the fee your platform actually charges.</p>
+<p><strong>Target ROI:</strong> the minimum return you want from the money you put into the item. Higher target = more selective deals.</p>
+<p class="example"><strong>Example:</strong> If you spend $25 and make $10 profit, your ROI is 40%. Setting a 40% target means you want at least that level of return.</p>
+</div>
+        <div class="panelSub">Adjust for your marketplace and goals.</div>
+        <label>Selling fee</label>
+        <select id="preset">
+          <option value=".136">eBay — 13.6%</option>
+          <option value=".20">Poshmark — 20%</option>
+          <option value=".10">Mercari — 10%</option>
+          <option value=".10">Facebook Marketplace — 10%</option>
+          <option value=".08">Whatnot — 8%</option>
+          <option value="0">Depop — 0%</option>
+          <option value=".065">Etsy — 6.5%</option>
+          <option value=".15">Amazon — 15%</option>
           <option value="custom">Custom</option>
         </select>
-      </div>
-      <div class="field custom" id="customFeeWrap" hidden>
-        <label for="customRate">Custom selling fee (%)</label>
-        <input id="customRate" inputmode="decimal" type="number" min="0" max="100" step="0.1" placeholder="0.0" autocomplete="off">
-        <label for="customFixed" style="margin-top:10px">Custom fixed fee ($) <span class="optional">(optional)</span></label>
-        <input id="customFixed" inputmode="decimal" type="number" min="0" step="0.01" placeholder="0.00" autocomplete="off">
-      </div>
+        <div id="feeCustom" style="display:none;margin-top:8px"><div class="percent"><input id="fee" type="number" min="0" max="100" step=".1" value="13"></div></div>
+        <label>Your target ROI</label>
+        <div class="rangeRow"><input id="target" type="range" min="0" max="100" value="20"><div class="rangeVal" id="targetOut">20%</div></div>
+        <div class="hint" style="margin-top:8px">Set the return you want before buying.</div>
+        <div class="advanced">⌄ Advanced options <span style="float:right">Coming later</span></div>
+      </section>
 
-      <div class="targetRow">
-        <div class="targetTop"><span>Target ROI</span><span class="targetOut" id="targetOut">40.0%</span></div>
-        <input class="range" id="target" type="range" min="10" max="100" step="1" value="40" aria-label="Target ROI">
-        <div class="rangeHint"><span>10%</span><span>100%</span></div>
-      </div>
-      <div class="bottom"><small>Screening estimate — not a profit guarantee.</small><button class="btn" type="button" id="clearBtn">Clear</button></div>
-    </form>
-
-    <section class="card" aria-live="polite">
-      <div class="section-head"><h2>Verdict</h2><button class="help" type="button" data-help="verdictHelp" aria-expanded="false" aria-label="Explain Verdict">?</button></div>
-      <div class="helpbox" id="verdictHelp" hidden>BUY means the calculated ROI meets your target. CONSIDER means it is at least halfway to your target. SKIP falls below that.</div>
-      <div class="verdict" id="verdictBox" data-verdict="enter-numbers"><strong id="verdict">ENTER NUMBERS</strong><span id="feeRate">13.6%</span></div>
-      <div class="metricGrid">
-        <div class="metric"><small>Profit</small><strong id="profit">—</strong></div>
-        <div class="metric"><small>ROI</small><strong id="roi">—</strong></div>
-        <div class="metric"><small>Margin</small><strong id="margin">—</strong></div>
-      </div>
-
-      <div class="section-head" style="margin-top:24px"><h2>Cost Breakdown</h2><button class="help" type="button" data-help="chartHelp" aria-expanded="false" aria-label="Explain Cost Breakdown">?</button></div>
-      <div class="helpbox" id="chartHelp" hidden>The chart separates the expected sale into your item and other costs, estimated platform fees, and profit.</div>
-      <div class="chartWrap">
-        <div class="donut" id="donut"><div class="donutCenter" id="donutCenter">—</div></div>
-        <div class="breakdown">
-          <div class="row"><span><i class="dot"></i>Profit</span><strong id="profitBreak">—</strong></div>
-          <div class="row"><span><i class="dot red"></i>Item + costs</span><strong id="costSummary">—</strong></div>
-          <div class="row"><span><i class="dot soft"></i>Fees</span><strong id="feeSummary">—</strong></div>
-          <div class="row"><span>Expected sale</span><strong id="saleSummary">—</strong></div>
+      <section class="panel verdictPanel">
+        <div class="info-title-help"><div class="panelTitle"><span class="icon">▥</span> The Verdict</div><button type="button" class="info-help-btn" data-info-help="verdict" aria-label="Explain The Verdict">?</button></div><div class="info-help-panel" data-info-panel="verdict"><p>The Verdict is the calculator's quick read on the deal. It compares your estimated ROI with the target you set and shows whether the numbers currently fall into BUY, CONSIDER, or SKIP.</p></div>
+        <div class="verdict" id="verdictBox">
+          <h2 id="verdict">Enter your numbers</h2>
+          <p id="signalSub">Fill in at least the buy price and expected sale price to see your result.</p>
         </div>
-      </div>
+        <div class="metrics3">
+          <div class="m3"><span>Est. Profit</span><strong id="profit">—</strong></div>
+          <div class="m3"><span>ROI</span><strong id="roi">—</strong></div>
+          <div class="m3"><span>Profit Margin</span><strong id="margin">—</strong></div>
+        </div>
+      </section>
+    </div>
 
-      <div class="section-head" style="margin-top:24px"><h2>Quick Insights</h2><button class="help" type="button" data-help="insightHelp" aria-expanded="false" aria-label="Explain Quick Insights">?</button></div>
-      <div class="helpbox" id="insightHelp" hidden>These are simple screening observations based only on the numbers you entered.</div>
-      <div class="insights"><div class="insight" id="insightFee">Enter a buy and sale price to see the fee impact.</div><div class="insight" id="insightBreakEven">Your break-even sale price will appear here.</div></div>
-      <div class="section-head share-head" style="margin-top:24px"><h2>Export</h2><button class="help" type="button" data-help="shareHelp" aria-expanded="false" aria-label="Explain Export">?</button></div>
-      <div class="helpbox" id="shareHelp" hidden>Create a polished deal breakdown, then send it by Messages or email, use your device's share menu, or save it as a PNG.</div>
-      <div class="exportPanel">
-        <button class="exportHero" id="exportBtn" type="button">
-          <span class="exportHeroIcon" aria-hidden="true">↗</span>
-          <span class="exportHeroText"><strong>Export Breakdown</strong><small>Text, email, share, or save</small></span>
-          <span class="exportHeroArrow" aria-hidden="true">›</span>
-        </button>
-        <div class="shareStatus" id="shareStatus" role="status" aria-live="polite">Enter a deal first, then export your breakdown.</div>
-      </div>
-    </section>
-  </div>
-</main>
+    <div class="bottom">
+      <section class="panel">
+        <div class="info-title-help"><div class="panelTitle"><span class="icon">◔</span> Cost Breakdown</div><button type="button" class="info-help-btn" data-info-help="cost" aria-label="Explain Cost Breakdown">?</button></div><div class="info-help-panel" data-info-panel="cost"><p>The Cost Breakdown shows where the money in the deal goes. It separates the item cost, selling fees, shipping, other costs, and estimated profit so you can see what is affecting the result.</p></div>
+        <div class="chartWrap">
+          <canvas id="pie" width="220" height="220"></canvas>
+          <div class="legend">
+            <div class="leg"><span><i class="dot" style="background:#49df83"></i>Your Profit</span><strong id="lgProfit">—</strong></div>
+            <div class="leg"><span><i class="dot" style="background:#ff3d46"></i>Item Cost</span><strong id="lgBuy">—</strong></div>
+            <div class="leg"><span><i class="dot" style="background:#ff7b81"></i>Selling Fees</span><strong id="lgFees">—</strong></div>
+            <div class="leg"><span><i class="dot" style="background:#ffb4b8"></i>Shipping</span><strong id="lgShip">—</strong></div>
+            <div class="leg"><span><i class="dot" style="background:#ffd5d8"></i>Other Costs</span><strong id="lgOther">—</strong></div>
+            <div style="border-top:1px solid var(--line);padding-top:10px" class="leg"><span style="color:var(--ink);font-weight:850">Total Sale Price</span><strong id="lgSale">—</strong></div>
+          </div>
+        </div>
+      </section>
 
-<div class="modal" id="guide" hidden aria-hidden="true">
-  <div class="modal-backdrop" id="guideBackdrop"></div>
-  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
-    <h2 id="guideTitle">Quick Guide</h2>
-    <p>Enter your buy price and expected sale price. Add shipping or other costs if they apply. Pick a marketplace, set the ROI you want, then use the verdict to screen the deal. When you're ready, tap Export Breakdown to send it by Messages, email, another share option, or save it as a PNG.</p>
-    <p>The calculator is a screening estimate, not a guarantee of profit.</p>
-    <button class="btn primary" id="closeGuide" type="button">Got it</button>
+      <section class="panel">
+        <div class="info-title-help"><div class="panelTitle"><span class="icon">♙</span> Profit Summary</div><button type="button" class="info-help-btn" data-info-help="profit" aria-label="Explain Profit Summary">?</button></div><div class="info-help-panel" data-info-panel="profit"><p>The Profit Summary puts the key financial results in one place, including estimated profit, ROI, and profit margin.</p></div>
+        <div class="summary">
+          <div class="sumrow"><span>Expected Sale Price</span><strong id="sSale">—</strong></div>
+          <div class="sumrow"><span>Item Cost</span><strong id="sBuy">—</strong></div>
+          <div class="sumrow"><span>Selling Fees</span><strong id="sFees">—</strong></div>
+          <div class="sumrow"><span>Shipping Cost</span><strong id="sShip">—</strong></div>
+          <div class="sumrow"><span>Other Costs</span><strong id="sOther">—</strong></div>
+          <div class="sumrow total"><span>Estimated Profit</span><strong id="sProfit">—</strong></div>
+          <div class="sumrow"><span>ROI</span><strong id="sROI">—</strong></div>
+          <div class="sumrow"><span>Profit Margin</span><strong id="sMargin">—</strong></div>
+        </div>
+        <button class="export" id="exportBtn">↗ Export Breakdown</button>
+      </section>
+
+      <section class="panel">
+        <div class="info-title-help"><div class="panelTitle"><span class="icon">♧</span> Quick Insights</div><button type="button" class="info-help-btn" data-info-help="insights" aria-label="Explain Quick Insights">?</button></div><div class="info-help-panel" data-info-panel="insights"><p>An overview of the whole deal, highlighting the most important numbers and takeaways from the calculation.</p></div>
+        <div class="insights">
+          <div class="insight"><b>◉</b><span id="insight1">Is this a good deal?</span></div>
+          <div class="insight"><b>◉</b><span id="insight2">How does it meet your ROI goal?</span></div>
+          <div class="insight"><b>◉</b><span id="insight3">What's the biggest cost?</span></div>
+          <div class="insight"><b>◉</b><span id="insight4">Tips to improve profitability.</span></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="bottomStrip">
+      <div class="strip"><div class="stripIcon">ϟ</div><div><strong>FAST DECISIONS</strong><span>Get an answer in seconds.</span></div></div>
+      <div class="strip"><div class="stripIcon">♢</div><div><strong>BUY SMARTER</strong><span>Avoid low-profit traps.</span></div></div>
+      <div class="strip"><div class="stripIcon">▥</div><div><strong>MAXIMIZE PROFIT</strong><span>Know your numbers.</span></div></div>
+      <div class="strip"><div class="stripIcon">□</div><div><strong>BUILT FOR RESELLERS</strong><span>Simple. Accurate. Effective.</span></div></div>
+    </div>
+  </main>
+
+  <footer class="foot"><span>↗ FLIP OR SKIP — Tools for smarter resellers.</span><span>This tool provides estimates only. Always verify fees and market value.</span></footer>
+</div>
+
+
+
+<div class="exportModal" id="exportModal" aria-hidden="true">
+  <div class="exportBox" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+    <div class="exportHead">
+      <h3 id="exportTitle">Deal Breakdown</h3>
+      <div class="exportActions">
+        <button type="button" id="closeExport">Close</button>
+        <button type="button" class="shareExport" id="shareExport">↗ Share</button>
+        <button type="button" class="saveExport" id="saveExport">↓ Save PNG</button>
+      </div>
+    </div>
+    <img class="exportPreview" id="exportPreview" alt="Flip or Skip deal breakdown preview">
   </div>
 </div>
 
-<div class="modal export-modal" id="exportMenu" hidden aria-hidden="true">
-  <div class="modal-backdrop" id="exportBackdrop"></div>
-  <div class="modal-card export-sheet" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
-    <div class="exportSheetHead">
+<div class="guideOverlay" id="guideOverlay" aria-hidden="true">
+  <aside class="guideDrawer" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
+    <div class="guideHead">
       <div>
-        <div class="eyebrow">FLIP OR SKIP</div>
-        <h2 id="exportTitle">Export Breakdown</h2>
-        <p>Choose how you want to send the deal.</p>
+        <div class="guideKicker">30-second walkthrough</div>
+        <h2 id="guideTitle">How Flip or Skip works</h2>
       </div>
-      <button class="sheetClose" id="closeExport" type="button" aria-label="Close export menu">×</button>
+      <button class="closeGuide" id="closeGuide" type="button" aria-label="Close guide">×</button>
     </div>
-    <div class="exportChoices">
-      <button class="exportChoice" id="textBtn" type="button"><span class="choiceIcon">💬</span><span><strong>Text / Messages</strong><small>Send the breakdown from your share sheet</small></span><span class="choiceArrow">›</span></button>
-      <button class="exportChoice" id="emailBtn" type="button"><span class="choiceIcon">✉</span><span><strong>Email</strong><small>Open a prefilled email summary</small></span><span class="choiceArrow">›</span></button>
-      <button class="exportChoice" id="shareBtn" type="button"><span class="choiceIcon">↗</span><span><strong>More Share Options</strong><small>AirDrop and other supported apps</small></span><span class="choiceArrow">›</span></button>
-      <button class="exportChoice" id="savePngBtn" type="button"><span class="choiceIcon">▣</span><span><strong>Save PNG</strong><small>Keep the branded breakdown image</small></span><span class="choiceArrow">›</span></button>
-    </div>
-  </div>
+
+    <p class="guideIntro">
+      Use this before buying a resale item. Enter what you expect to spend and what you realistically
+      expect to sell it for. Flip or Skip handles the math so you can make a faster decision.
+    </p>
+
+    <div class="guideStep"><div class="stepNum">1</div><div><h3>Enter your buy price</h3><p>What will the item actually cost you? This is required.</p></div></div>
+    <div class="guideStep"><div class="stepNum">2</div><div><h3>Enter the expected sale price</h3><p>Use a realistic selling price, not the highest price you hope to get.</p></div></div>
+    <div class="guideStep"><div class="stepNum">3</div><div><h3>Add known costs</h3><p>Shipping and other costs are optional, but they make the estimate more useful.</p></div></div>
+    <div class="guideStep"><div class="stepNum">4</div><div><h3>Set your target ROI</h3><p>Move the green slider to choose the return you want before buying.</p></div></div>
+    <div class="guideStep"><div class="stepNum">5</div><div><h3>Read the verdict</h3><p>BUY clears your target, CONSIDER is close, and SKIP misses it by more.</p></div></div>
+    <div class="guideStep"><div class="stepNum">6</div><div><h3>Share the breakdown</h3><p>Use Export Breakdown to create a clean deal card you can save or share.</p></div></div>
+
+    <div class="guideRule"><strong>Important:</strong> this is a screening tool, not a guarantee of profit. Verify condition, demand, actual fees and shipping before buying.</div>
+  </aside>
 </div>
-<div class="self-test" id="selfTest" hidden></div>
-<script src="../shared/calculator.js"></script>
-<script src="../shared/app.js"></script>
+
+<script>
+const $=id=>document.getElementById(id);
+const money=n=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(n);
+const num=id=>Math.max(0,Number($(id).value)||0);
+
+let pieFrame=0;
+let pieParts=[];
+function drawPie(parts){
+  pieParts=parts;
+  if(pieFrame)return;
+  pieFrame=requestAnimationFrame(()=>{
+    pieFrame=0;
+    const c=$('pie'),ctx=c.getContext('2d');
+    const rect=c.getBoundingClientRect();
+    const w=Math.max(1,Math.round(rect.width)),h=Math.max(1,Math.round(rect.height));
+    const d=Math.min(window.devicePixelRatio||1,2);
+    const targetW=Math.round(w*d),targetH=Math.round(h*d);
+    if(c.width!==targetW||c.height!==targetH){c.width=targetW;c.height=targetH;}
+    ctx.setTransform(d,0,0,d,0,0);
+    ctx.clearRect(0,0,w,h);
+    const vals=pieParts.map(x=>Math.max(0,x.value)),total=vals.reduce((a,b)=>a+b,0);
+    const cx=w/2,cy=h/2,r=Math.min(w,h)*.39;
+    if(total<=0){
+      ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='#263136';ctx.fill();
+      ctx.fillStyle='#aab4b7';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText('Enter numbers',cx,cy-2);ctx.fillText('to see chart',cx,cy+15);return;
+    }
+    let a=-Math.PI/2;
+    pieParts.forEach(p=>{
+      if(p.value<=0)return;
+      const b=a+(p.value/total)*Math.PI*2;
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,a,b);ctx.closePath();ctx.fillStyle=p.color;ctx.fill();a=b;
+    });
+    ctx.beginPath();ctx.arc(cx,cy,r*.48,0,Math.PI*2);ctx.fillStyle=getComputedStyle(document.documentElement).getPropertyValue('--panel');ctx.fill();
+  });
+}
+
+function calc(){
+ const buy=num('buy'),sale=num('sale'),ship=num('shipping'),other=num('other');
+ let feePct=$('preset').value==='custom'?num('fee')/100:Number($('preset').value);
+ const target=num('target')/100;
+ const fees=sale*feePct, profit=sale-buy-ship-other-fees;
+ const roi=buy>0?profit/buy:0, margin=sale>0?profit/sale:0;
+
+ ['buy','sale'].forEach(id=>$(id).classList.toggle('inputAttention',num(id)<=0));
+
+ $('targetOut').textContent=(target*100).toFixed(0)+'%';
+ $('target').style.setProperty('--range-progress',(target*100)+'%');
+ const has=buy>0&&sale>0;
+ $('verdict').textContent=!has?'Enter your numbers':roi>=target?'BUY':roi>=target*.5?'CONSIDER':'SKIP';
+ $('signalSub').textContent=!has?'Fill in at least the buy price and expected sale price to see your result.':
+   roi>=target?'Above your target — the deal clears your threshold.':
+   roi>=target*.5?'Close to target — investigate the deal before buying.':
+   'Below your target — the numbers do not clear your threshold.';
+ $('verdictBox').classList.toggle('ok',has&&roi>=target);
+
+ $('profit').textContent=has?money(profit):'—';
+ $('roi').textContent=has?(roi*100).toFixed(1)+'%':'—';
+ $('margin').textContent=has?(margin*100).toFixed(1)+'%':'—';
+
+ $('lgProfit').textContent=has?money(Math.max(0,profit)):'—';
+ $('lgBuy').textContent=has?money(buy):'—';
+ $('lgFees').textContent=has?money(fees):'—';
+ $('lgShip').textContent=has?money(ship):'—';
+ $('lgOther').textContent=has?money(other):'—';
+ $('lgSale').textContent=has?money(sale):'—';
+
+ $('sSale').textContent=has?money(sale):'—';
+ $('sBuy').textContent=has?money(buy):'—';
+ $('sFees').textContent=has?money(fees):'—';
+ $('sShip').textContent=has?money(ship):'—';
+ $('sOther').textContent=has?money(other):'—';
+ $('sProfit').textContent=has?money(profit):'—';
+ $('sROI').textContent=has?(roi*100).toFixed(1)+'%':'—';
+ $('sMargin').textContent=has?(margin*100).toFixed(1)+'%':'—';
+
+ if(!has){
+   $('insight1').textContent='Is this a good deal? Enter your numbers to find out.';
+   $('insight2').textContent='How does it meet your ROI goal?';
+   $('insight3').textContent="What's the biggest cost?";
+   $('insight4').textContent='Tips to improve profitability.';
+ }else{
+   const costs=[['item cost',buy],['selling fees',fees],['shipping',ship],['other costs',other]].sort((a,b)=>b[1]-a[1]);
+   $('insight1').textContent=roi>=target?'This deal clears your target ROI.':`This deal is ${Math.max(0,(target-roi)*100).toFixed(1)} points below your target ROI.`;
+   $('insight2').textContent=`Your ROI is ${(roi*100).toFixed(1)}% against a ${(target*100).toFixed(0)}% goal.`;
+   $('insight3').textContent=`Your largest cost is ${costs[0][0]} at ${money(costs[0][1])}.`;
+   $('insight4').textContent=profit<0?'You are losing money at the expected sale price.':`You keep ${money(profit)} after the listed costs and fees.`;
+ }
+ drawPie([
+  {value:Math.max(0,profit),color:'#49df83'},
+  {value:buy,color:'#ff3d46'},
+  {value:fees,color:'#ff7b81'},
+  {value:ship,color:'#ffb4b8'},
+  {value:other,color:'#ffd5d8'}
+ ]);
+}
+
+['buy','sale','shipping','other'].forEach(id=>{
+  const el=$(id);
+  el.addEventListener('focus',()=>{
+    if(el.value==='0') el.value='';
+  });
+  el.addEventListener('input',calc);
+  el.addEventListener('blur',()=>{
+    if(el.value.trim()==='') el.value='';
+    calc();
+  });
+});
+$('preset').addEventListener('change',()=>{
+ $('feeCustom').style.display=$('preset').value==='custom'?'block':'none';calc();
+});
+$('fee').addEventListener('input',calc);$('target').addEventListener('input',calc);
+
+$('clear').addEventListener('click',()=>{
+ ['buy','sale','shipping','other'].forEach(id=>$(id).value='');calc();
+});
+
+
+$('exportBtn').addEventListener('click',()=>{
+ const buy=num('buy'),sale=num('sale'),ship=num('shipping'),other=num('other');
+ let feePct=$('preset').value==='custom'?num('fee')/100:Number($('preset').value);
+ const target=num('target')/100,fees=sale*feePct;
+ const profit=sale-buy-ship-other-fees,roi=buy>0?profit/buy:0,margin=sale>0?profit/sale:0;
+ if(!(buy>0&&sale>0)){
+   alert('Enter a buy price and expected sale price first.');
+   return;
+ }
+ const c=document.createElement('canvas'),ctx=c.getContext('2d');
+ c.width=1400;c.height=900;
+ const bg=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#070b0d';
+ const panel=getComputedStyle(document.documentElement).getPropertyValue('--panel').trim()||'#0d1417';
+ const ink=getComputedStyle(document.documentElement).getPropertyValue('--ink').trim()||'#f4f6f5';
+ const muted=getComputedStyle(document.documentElement).getPropertyValue('--muted').trim()||'#9aa6aa';
+ const green='#49df83',red='#ff3d46';
+ ctx.fillStyle=bg;ctx.fillRect(0,0,c.width,c.height);
+ ctx.fillStyle=panel;roundRect(ctx,55,55,1290,790,24);ctx.fill();
+ ctx.strokeStyle='#29353a';ctx.lineWidth=2;ctx.stroke();
+ ctx.fillStyle=green;ctx.font='900 30px Arial';ctx.fillText('FLIP',85,115);
+ ctx.fillStyle=ink;ctx.fillText(' OR ',175,115);
+ ctx.fillStyle=red;ctx.fillText('SKIP',250,115);
+ ctx.fillStyle=muted;ctx.font='600 17px Arial';ctx.fillText('DEAL BREAKDOWN',85,150);
+ ctx.fillStyle=ink;ctx.font='500 48px Georgia';
+ ctx.fillText(roi>=target?'BUY':roi>=target*.5?'CONSIDER':'SKIP',85,225);
+ ctx.fillStyle=muted;ctx.font='18px Arial';ctx.fillText(`Target ROI: ${(target*100).toFixed(0)}%`,85,260);
+
+ const metrics=[
+  ['EXPECTED SALE',money(sale)],
+  ['EST. PROFIT',money(profit)],
+  ['ROI',(roi*100).toFixed(1)+'%'],
+  ['PROFIT MARGIN',(margin*100).toFixed(1)+'%']
+ ];
+ metrics.forEach((m,i)=>{
+   const x=85+i*300;
+   ctx.fillStyle='#111a1e';roundRect(ctx,x,305,270,120,14);ctx.fill();
+   ctx.fillStyle=muted;ctx.font='700 12px Arial';ctx.fillText(m[0],x+18,335);
+   ctx.fillStyle=i===1&&profit>=0?green:i===1?red:ink;ctx.font='800 27px Arial';ctx.fillText(m[1],x+18,382);
+ });
+ ctx.fillStyle=ink;ctx.font='800 17px Arial';ctx.fillText('COST BREAKDOWN',85,485);
+ const parts=[
+  ['Your Profit',Math.max(0,profit),green],
+  ['Item Cost',buy,red],
+  ['Selling Fees',fees,'#ff7b81'],
+  ['Shipping',ship,'#ffb4b8'],
+  ['Other Costs',other,'#ffd5d8']
+ ];
+ const total=parts.reduce((a,x)=>a+x[1],0);
+ let angle=-Math.PI/2,cx=235,cy=650,r=125;
+ if(total>0) parts.forEach(p=>{
+   if(p[1]<=0)return;
+   const next=angle+(p[1]/total)*Math.PI*2;
+   ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,r,angle,next);ctx.closePath();ctx.fillStyle=p[2];ctx.fill();angle=next;
+ });
+ ctx.fillStyle=panel;ctx.beginPath();ctx.arc(cx,cy,62,0,Math.PI*2);ctx.fill();
+ parts.forEach((p,i)=>{
+   const x=450,y=535+i*52;
+   ctx.fillStyle=p[2];ctx.beginPath();ctx.arc(x,y-5,7,0,Math.PI*2);ctx.fill();
+   ctx.fillStyle=muted;ctx.font='600 16px Arial';ctx.fillText(p[0],x+18,y);
+   ctx.fillStyle=ink;ctx.font='700 16px Arial';ctx.fillText(money(p[1]),x+205,y);
+ });
+ ctx.strokeStyle='#29353a';ctx.beginPath();ctx.moveTo(85,800);ctx.lineTo(1315,800);ctx.stroke();
+ ctx.fillStyle=muted;ctx.font='12px Arial';ctx.fillText('Estimates only — verify actual fees, shipping and market value before buying.',85,827);
+ const png=c.toDataURL('image/png');
+ const exportModal=$('exportModal'),exportPreview=$('exportPreview');
+ exportPreview.src=png;
+ exportModal.classList.add('open');exportModal.setAttribute('aria-hidden','false');
+ $('saveExport').onclick=()=>{
+   const a=document.createElement('a');a.href=png;a.download='flip-or-skip-breakdown.png';a.style.display='none';
+   document.body.appendChild(a);a.click();a.remove();
+ };
+$('shareExport').onclick=async()=>{
+   try{
+     const res=await fetch(png);
+     const blob=await res.blob();
+     const file=new File([blob],'flip-or-skip-breakdown.png',{type:'image/png'});
+     if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+       await navigator.share({title:'Flip or Skip Deal Breakdown',text:'Here is the deal breakdown.',files:[file]});
+     }else if(navigator.share){
+       await navigator.share({title:'Flip or Skip Deal Breakdown',text:'Here is the deal breakdown.'});
+     }else{
+       $('saveExport').click();
+     }
+   }catch(err){
+     if(err && err.name!=='AbortError') $('saveExport').click();
+   }
+ };
+
+});
+function roundRect(ctx,x,y,w,h,r){
+ ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();
+}
+
+
+const exportModal=$('exportModal');
+$('closeExport').addEventListener('click',()=>{exportModal.classList.remove('open');exportModal.setAttribute('aria-hidden','true');});
+exportModal.addEventListener('click',e=>{if(e.target===exportModal){exportModal.classList.remove('open');exportModal.setAttribute('aria-hidden','true');}});
+
+const guideOverlay = $('guideOverlay');
+const guideBtn = $('guideBtn');
+const closeGuide = $('closeGuide');
+
+function openGuide(){
+  guideOverlay.classList.add('open');
+  guideOverlay.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+}
+function closeGuidePanel(){
+  guideOverlay.classList.remove('open');
+  guideOverlay.setAttribute('aria-hidden','true');
+  document.body.style.overflow='';
+}
+guideBtn.addEventListener('click', openGuide);
+closeGuide.addEventListener('click', closeGuidePanel);
+guideOverlay.addEventListener('click', (e)=>{
+  if(e.target === guideOverlay) closeGuidePanel();
+});
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape' && guideOverlay.classList.contains('open')) closeGuidePanel();
+  if(e.key === 'Escape' && exportModal.classList.contains('open')) { exportModal.classList.remove('open'); exportModal.setAttribute('aria-hidden','true'); }
+});
+
+$('themeBtn').addEventListener('click',()=>{
+ const dark=document.documentElement.getAttribute('data-theme')!=='light';
+ document.documentElement.setAttribute('data-theme',dark?'light':'dark');
+ $('themeBtn').textContent=dark?'☾ Dark Mode':'☀ Light Mode';
+ drawPie([
+  {value:0,color:'#49df83'},{value:0,color:'#ff3d46'},{value:0,color:'#ff7b81'}
+ ]);
+ calc();
+});
+
+let resizeTimer;
+window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{drawPie(pieParts);},120)},{passive:true});
+calc();
+</script>
+
+<script id="help-v17-js">
+document.addEventListener('click',function(e){
+  const b=e.target.closest('.panel-help-btn');
+  if(!b)return;
+  const key=b.getAttribute('data-help-key');
+  const p=document.querySelector('[data-panel-help="'+key+'"]');
+  if(!p)return;
+  const was=p.classList.contains('open');
+  document.querySelectorAll('.panel-help.open').forEach(x=>x.classList.remove('open'));
+  if(!was)p.classList.add('open');
+});
+</script>
+
+
+<script id="info-help-v19-js">
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('.info-help-btn');
+  if(!btn)return;
+  const key=btn.getAttribute('data-info-help');
+  const panel=document.querySelector('[data-info-panel="'+key+'"]');
+  if(!panel)return;
+  const was=panel.classList.contains('open');
+  document.querySelectorAll('.info-help-panel.open').forEach(p=>p.classList.remove('open'));
+  if(!was)panel.classList.add('open');
+});
+</script>
+
 </body>
 </html>
