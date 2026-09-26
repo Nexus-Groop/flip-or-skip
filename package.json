@@ -1,0 +1,11 @@
+{
+  "name": "flip-or-skip",
+  "version": "0.2.0",
+  "private": true,
+  "description": "FLIP OR SKIP reseller deal calculator",
+  "scripts": {
+    "test": "npm run test:calculator && npm run test:controller",
+    "test:calculator": "cd tests && node test_calculator.js",
+    "test:controller": "cd tests && node test_app_controller.js"
+  }
+}
