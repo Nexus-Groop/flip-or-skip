@@ -284,6 +284,7 @@
   function savePng() {
     var result = requireDeal();
     if (!result) return;
+    closeExportMenu();
     var canvas = drawShareCard(result);
     if (!canvas || !canvas.toDataURL) {
       setShareStatus('PNG export is not supported by this browser.', 'error');
@@ -301,6 +302,7 @@
   function emailDeal() {
     var result = requireDeal();
     if (!result) return;
+    closeExportMenu();
     var subject = 'FLIP OR SKIP — ' + result.verdict + ' deal breakdown';
     var body = buildShareText(result);
     global.location.href = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
@@ -310,6 +312,7 @@
   function textDeal() {
     var result = requireDeal();
     if (!result) return;
+    closeExportMenu();
     if (nativeShare(result, 'Choose Messages from the share sheet.')) return;
 
     var summary = buildShareText(result);
@@ -328,13 +331,40 @@
     }
   }
 
+  function openExportMenu() {
+    var result = requireDeal();
+    if (!result) return;
+    var menu = $('exportMenu');
+    if (!menu) return;
+    menu.hidden = false;
+    menu.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeExportMenu() {
+    var menu = $('exportMenu');
+    if (!menu) return;
+    menu.hidden = true;
+    menu.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  }
+
+  var exportBtn = $('exportBtn');
+  var exportMenu = $('exportMenu');
+  var exportBackdrop = $('exportBackdrop');
+  var closeExport = $('closeExport');
   var shareBtn = $('shareBtn');
   var emailBtn = $('emailBtn');
   var textBtn = $('textBtn');
   var savePngBtn = $('savePngBtn');
+
+  if (exportBtn) exportBtn.addEventListener('click', openExportMenu);
+  if (exportBackdrop) exportBackdrop.addEventListener('click', closeExportMenu);
+  if (closeExport) closeExport.addEventListener('click', closeExportMenu);
   if (shareBtn) shareBtn.addEventListener('click', function () {
     var result = requireDeal();
     if (!result) return;
+    closeExportMenu();
     if (!nativeShare(result, 'Opening your share sheet…')) savePng();
   });
   if (emailBtn) emailBtn.addEventListener('click', emailDeal);
@@ -395,7 +425,14 @@
     });
     test('theme toggles', function () { var before = document.documentElement.classList.contains('light'); $('themeBtn').click(); assert(document.documentElement.classList.contains('light') !== before, 'theme did not toggle'); $('themeBtn').click(); });
     test('guide opens and closes', function () { $('guideBtn').click(); assert($('guide').hidden === false, 'guide did not open'); $('closeGuide').click(); assert($('guide').hidden === true, 'guide did not close'); });
-    test('share controls ready', function () { assert($('shareBtn') && $('emailBtn') && $('textBtn') && $('savePngBtn'), 'share controls missing'); });
+    test('export menu opens and closes', function () {
+      input('buy','30'); input('sale','60');
+      $('exportBtn').click();
+      assert($('exportMenu').hidden === false, 'export menu did not open');
+      $('closeExport').click();
+      assert($('exportMenu').hidden === true, 'export menu did not close');
+    });
+    test('share controls ready', function () { assert($('exportBtn') && $('shareBtn') && $('emailBtn') && $('textBtn') && $('savePngBtn'), 'share controls missing'); });
     test('no horizontal overflow', function () { assert(document.documentElement.scrollWidth <= window.innerWidth + 1, 'horizontal overflow: ' + document.documentElement.scrollWidth + ' > ' + window.innerWidth); });
 
     var passed = results.filter(function (r) { return r.pass; }).length;
