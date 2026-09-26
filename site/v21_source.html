@@ -169,4 +169,156 @@ button.clear:hover{background:var(--panel2);color:var(--ink)}
 .exportModal.open{display:flex}
 .exportBox{width:min(920px,96vw);max-height:92vh;overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:0 24px 80px rgba(0,0,0,.45)}
 .exportHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.exportHead h3{margin:0;font-size:16px}.exportActions{display:flex;gap:9px}.exportActions button{border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:9px;padding:9px 13px;font-weight:800;cursor:pointer}.exportActions .shareExport{background:var(--panel2);color:var(--ink);border-color:var(--line)}
-.exportActions .saveExport{background
+.exportActions .saveExport{background:var(--green);color:#06100a;border-color:var(--green)}
+.exportPreview{display:block;width:100%;height:auto;border-radius:12px;border:1px solid var(--line);background:#070b0d}
+</style>
+
+<style id="help-v17">
+.panel-title-help{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%}
+.panel-help-btn{width:30px;height:30px;min-width:30px;border-radius:50%;border:1px solid var(--green);background:rgba(70,220,130,.12);color:var(--green);font-weight:900;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 0 3px rgba(70,220,130,.06);transition:.15s}
+.panel-help-btn:hover{background:rgba(70,220,130,.22);transform:scale(1.06)}
+.panel-help{display:none;margin:10px 0 16px;padding:14px 15px;border:1px solid rgba(70,220,130,.45);border-radius:12px;background:var(--panel2)}
+.panel-help.open{display:block}
+.panel-help h4{margin:0 0 7px;color:var(--ink);font-size:13px}
+.panel-help p{margin:0 0 8px;color:var(--muted);font-size:11px;line-height:1.5}
+.panel-help p:last-child{margin-bottom:0}
+.panel-help strong{color:var(--ink)}
+.panel-help .example{border-left:2px solid var(--green);padding-left:10px}
+</style>
+
+
+<style id="info-help-v19">
+.info-title-help{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%}
+.info-help-btn{width:30px;height:30px;min-width:30px;border-radius:50%;border:1px solid var(--green);background:rgba(70,220,130,.12);color:var(--green);font-weight:900;font-size:16px;line-height:1;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 0 3px rgba(70,220,130,.06);transition:.15s}
+.info-help-btn:hover{background:rgba(70,220,130,.22);transform:scale(1.06)}
+.info-help-panel{display:none;margin:10px 0 14px;padding:13px 14px;border:1px solid rgba(70,220,130,.40);border-radius:12px;background:var(--panel2)}
+.info-help-panel.open{display:block}
+.info-help-panel p{margin:0;color:var(--muted);font-size:11px;line-height:1.5}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <nav class="nav">
+    <div class="brand"><span class="mark">↗</span><span><span class="g">FLIP</span> OR <span class="r">SKIP</span></span></div>
+    <div class="navright">
+      <div class="tab active">▣ Calculator</div>
+      <button class="tab guideBtn" id="guideBtn" type="button">▢ Quick Guide</button>
+      <button class="theme" id="themeBtn">☀ Light Mode</button>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div><h1>Should You Flip It?</h1><p>Run the numbers before you buy. Fast, simple, and built for resellers.</p></div>
+    <div class="quote">“Know the numbers before you spend the money.”<br>────────</div>
+  </header>
+
+  <main>
+    <div class="gridtop">
+      <section class="panel">
+        <div class="panel-title-help"><div class="panelTitle"><span class="icon">🛒</span> 1. The Deal</div><button type="button" class="panel-help-btn" data-help-key="deal" aria-label="Explain The Deal">?</button></div><div class="panel-help" data-panel-help="deal">
+<h4>The Deal — what goes here?</h4>
+<p><strong>Buy Price:</strong> what you will actually pay for the item.</p>
+<p><strong>Expected Sale:</strong> what you realistically think the item will sell for. Recent sold prices are better than the highest asking price you see.</p>
+<p><strong>Shipping:</strong> what you expect to spend sending the item to the buyer. Leave it at $0 if you don't know yet.</p>
+<p><strong>Other Costs:</strong> extra costs connected to the flip, such as packaging, cleaning, repairs, or replacement parts.</p>
+<p class="example"><strong>Example:</strong> You find a game for $20 and realistically expect to sell it for $50. Enter $20 for Buy Price, $50 for Expected Sale, and your estimated shipping cost.</p>
+</div>
+        <div class="panelSub">Start with the basics.</div>
+        <div class="row2">
+          <div><label class="req">What are you paying?</label><div class="money"><input id="buy" type="number" min="0" step=".01" value="" placeholder="0.00"></div></div>
+          <div><label class="req">Expected sale price?</label><div class="money"><input id="sale" type="number" min="0" step=".01" value="" placeholder="0.00"></div></div>
+        </div>
+        <div class="row2">
+          <div><label>Shipping cost <span style="font-weight:500">(optional)</span></label><div class="money"><input id="shipping" type="number" min="0" step=".01" value="" placeholder="0.00"></div><div class="hint">e.g. $5.00</div></div>
+          <div><label>Other costs <span style="font-weight:500">(optional)</span></label><div class="money"><input id="other" type="number" min="0" step=".01" value="" placeholder="0.00"></div><div class="hint">e.g. packaging, supplies, etc.</div></div>
+        </div>
+        <button class="clear" id="clear">Clear inputs</button>
+      </section>
+
+      <section class="panel">
+        <div class="panel-title-help"><div class="panelTitle"><span class="icon">⚙</span> 2. Fees & Target</div><button type="button" class="panel-help-btn" data-help-key="fees" aria-label="Explain Fees and Target">?</button></div><div class="panel-help" data-panel-help="fees">
+<h4>Fees & Target — what do these mean?</h4>
+<p><strong>Marketplace Fee:</strong> the percentage of the sale that the selling platform takes. Use the fee your platform actually charges.</p>
+<p><strong>Target ROI:</strong> the minimum return you want from the money you put into the item. Higher target = more selective deals.</p>
+<p class="example"><strong>Example:</strong> If you spend $25 and make $10 profit, your ROI is 40%. Setting a 40% target means you want at least that level of return.</p>
+</div>
+        <div class="panelSub">Adjust for your marketplace and goals.</div>
+        <label>Selling fee</label>
+        <select id="preset">
+          <option value=".136">eBay — 13.6%</option>
+          <option value=".20">Poshmark — 20%</option>
+          <option value=".10">Mercari — 10%</option>
+          <option value=".10">Facebook Marketplace — 10%</option>
+          <option value=".08">Whatnot — 8%</option>
+          <option value="0">Depop — 0%</option>
+          <option value=".065">Etsy — 6.5%</option>
+          <option value=".15">Amazon — 15%</option>
+          <option value="custom">Custom</option>
+        </select>
+        <div id="feeCustom" style="display:none;margin-top:8px"><div class="percent"><input id="fee" type="number" min="0" max="100" step=".1" value="13"></div></div>
+        <label>Your target ROI</label>
+        <div class="rangeRow"><input id="target" type="range" min="0" max="100" value="20"><div class="rangeVal" id="targetOut">20%</div></div>
+        <div class="hint" style="margin-top:8px">Set the return you want before buying.</div>
+        <div class="advanced">⌄ Advanced options <span style="float:right">Coming later</span></div>
+      </section>
+
+      <section class="panel verdictPanel">
+        <div class="info-title-help"><div class="panelTitle"><span class="icon">▥</span> The Verdict</div><button type="button" class="info-help-btn" data-info-help="verdict" aria-label="Explain The Verdict">?</button></div><div class="info-help-panel" data-info-panel="verdict"><p>The Verdict is the calculator's quick read on the deal. It compares your estimated ROI with the target you set and shows whether the numbers currently fall into BUY, CONSIDER, or SKIP.</p></div>
+        <div class="verdict" id="verdictBox">
+          <h2 id="verdict">Enter your numbers</h2>
+          <p id="signalSub">Fill in at least the buy price and expected sale price to see your result.</p>
+        </div>
+        <div class="metrics3">
+          <div class="m3"><span>Est. Profit</span><strong id="profit">—</strong></div>
+          <div class="m3"><span>ROI</span><strong id="roi">—</strong></div>
+          <div class="m3"><span>Profit Margin</span><strong id="margin">—</strong></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="bottom">
+      <section class="panel">
+        <div class="info-title-help"><div class="panelTitle"><span class="icon">◔</span> Cost Breakdown</div><button type="button" class="info-help-btn" data-info-help="cost" aria-label="Explain Cost Breakdown">?</button></div><div class="info-help-panel" data-info-panel="cost"><p>The Cost Breakdown shows where the money in the deal goes. It separates the item cost, selling fees, shipping, other costs, and estimated profit so you can see what is affecting the result.</p></div>
+        <div class="chartWrap">
+          <canvas id="pie" width="220" height="220"></canvas>
+          <div class="legend">
+            <div class="leg"><span><i class="dot" style="background:#49df83"></i>Your Profit</span><strong id="lgProfit">—</strong></div>
+            <div class="leg"><span><i class="dot" style="background:#ff3d46"></i>Item Cost</span><strong id="lgBuy">—</strong></div>
+            <div class="leg"><span><i class="dot" style="background:#ff7b81"></i>Selling Fees</span><strong id="lgFees">—</strong></div>
+            <div class="leg"><span><i class="dot" style="background:#ffb4b8"></i>Shipping</span><strong id="lgShip">—</strong></div>
+            <div class="leg"><span><i class="dot" style="background:#ffd5d8"></i>Other Costs</span><strong id="lgOther">—</strong></div>
+            <div style="border-top:1px solid var(--line);padding-top:10px" class="leg"><span style="color:var(--ink);font-weight:850">Total Sale Price</span><strong id="lgSale">—</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="info-title-help"><div class="panelTitle"><span class="icon">♙</span> Profit Summary</div><button type="button" class="info-help-btn" data-info-help="profit" aria-label="Explain Profit Summary">?</button></div><div class="info-help-panel" data-info-panel="profit"><p>The Profit Summary puts the key financial results in one place, including estimated profit, ROI, and profit margin.</p></div>
+        <div class="summary">
+          <div class="sumrow"><span>Expected Sale Price</span><strong id="sSale">—</strong></div>
+          <div class="sumrow"><span>Item Cost</span><strong id="sBuy">—</strong></div>
+          <div class="sumrow"><span>Selling Fees</span><strong id="sFees">—</strong></div>
+          <div class="sumrow"><span>Shipping Cost</span><strong id="sShip">—</strong></div>
+          <div class="sumrow"><span>Other Costs</span><strong id="sOther">—</strong></div>
+          <div class="sumrow total"><span>Estimated Profit</span><strong id="sProfit">—</strong></div>
+          <div class="sumrow"><span>ROI</span><strong id="sROI">—</strong></div>
+          <div class="sumrow"><span>Profit Margin</span><strong id="sMargin">—</strong></div>
+        </div>
+        <button class="export" id="exportBtn">↗ Export Breakdown</button>
+      </section>
+
+      <section class="panel">
+        <div class="info-title-help"><div class="panelTitle"><span class="icon">♧</span> Quick Insights</div><button type="button" class="info-help-btn" data-info-help="insights" aria-label="Explain Quick Insights">?</button></div><div class="info-help-panel" data-info-panel="insights"><p>An overview of the whole deal, highlighting the most important numbers and takeaways from the calculation.</p></div>
+        <div class="insights">
+          <div class="insight"><b>◉</b><span id="insight1">Is this a good deal?</span></div>
+          <div class="insight"><b>◉</b><span id="insight2">How does it meet your ROI goal?</span></div>
+          <div class="insight"><b>◉</b><span id="insight3">What's the biggest cost?</span></div>
+          <div class="insight"><b>◉</b><span id="insight4">Tips to improve profitability.</span></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="bottomStrip">
+      <div class="strip"><div class="stripIcon">ϟ</div><div><strong>FAST DECISIONS</strong><span>Get an answer in seconds.</span></div></div>
+      <div class="strip"><div class="stripIcon">♢</div><div><strong>BUY SMARTER</strong><span>Avoid low-profit tra
