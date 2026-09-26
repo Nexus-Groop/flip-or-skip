@@ -91,17 +91,15 @@
       <div class="section-head" style="margin-top:24px"><h2>Quick Insights</h2><button class="help" type="button" data-help="insightHelp" aria-expanded="false" aria-label="Explain Quick Insights">?</button></div>
       <div class="helpbox" id="insightHelp" hidden>These are simple screening observations based only on the numbers you entered.</div>
       <div class="insights"><div class="insight" id="insightFee">Enter a buy and sale price to see the fee impact.</div><div class="insight" id="insightBreakEven">Your break-even sale price will appear here.</div></div>
-      <div class="section-head share-head" style="margin-top:24px"><h2>Export &amp; Share</h2><button class="help" type="button" data-help="shareHelp" aria-expanded="false" aria-label="Explain Export and Share">?</button></div>
-      <div class="helpbox" id="shareHelp" hidden>Share Breakdown uses your device's native share sheet and attaches a branded PNG when supported. Email opens a prefilled message. Text / Messages opens the native share flow so you can choose Messages.</div>
-      <div class="sharePanel">
-        <div class="shareCopy">Send the deal without retyping the numbers.</div>
-        <div class="shareActions">
-          <button class="btn primary" id="shareBtn" type="button">Share Breakdown</button>
-          <button class="btn" id="emailBtn" type="button">Email</button>
-          <button class="btn" id="textBtn" type="button">Text / Messages</button>
-          <button class="btn" id="savePngBtn" type="button">Save PNG</button>
-        </div>
-        <div class="shareStatus" id="shareStatus" role="status" aria-live="polite">Enter a deal first, then share or export the breakdown.</div>
+      <div class="section-head share-head" style="margin-top:24px"><h2>Export</h2><button class="help" type="button" data-help="shareHelp" aria-expanded="false" aria-label="Explain Export">?</button></div>
+      <div class="helpbox" id="shareHelp" hidden>Create a polished deal breakdown, then send it by Messages or email, use your device's share menu, or save it as a PNG.</div>
+      <div class="exportPanel">
+        <button class="exportHero" id="exportBtn" type="button">
+          <span class="exportHeroIcon" aria-hidden="true">↗</span>
+          <span class="exportHeroText"><strong>Export Breakdown</strong><small>Text, email, share, or save</small></span>
+          <span class="exportHeroArrow" aria-hidden="true">›</span>
+        </button>
+        <div class="shareStatus" id="shareStatus" role="status" aria-live="polite">Enter a deal first, then export your breakdown.</div>
       </div>
     </section>
   </div>
@@ -111,9 +109,29 @@
   <div class="modal-backdrop" id="guideBackdrop"></div>
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="guideTitle">
     <h2 id="guideTitle">Quick Guide</h2>
-    <p>Enter your buy price and expected sale price. Add shipping or other costs if they apply. Pick a marketplace, set the ROI you want, then use the verdict to screen the deal. When you're ready, use Export & Share to send the breakdown by Messages, email, or save it as a PNG.</p>
+    <p>Enter your buy price and expected sale price. Add shipping or other costs if they apply. Pick a marketplace, set the ROI you want, then use the verdict to screen the deal. When you're ready, tap Export Breakdown to send it by Messages, email, another share option, or save it as a PNG.</p>
     <p>The calculator is a screening estimate, not a guarantee of profit.</p>
     <button class="btn primary" id="closeGuide" type="button">Got it</button>
+  </div>
+</div>
+
+<div class="modal export-modal" id="exportMenu" hidden aria-hidden="true">
+  <div class="modal-backdrop" id="exportBackdrop"></div>
+  <div class="modal-card export-sheet" role="dialog" aria-modal="true" aria-labelledby="exportTitle">
+    <div class="exportSheetHead">
+      <div>
+        <div class="eyebrow">FLIP OR SKIP</div>
+        <h2 id="exportTitle">Export Breakdown</h2>
+        <p>Choose how you want to send the deal.</p>
+      </div>
+      <button class="sheetClose" id="closeExport" type="button" aria-label="Close export menu">×</button>
+    </div>
+    <div class="exportChoices">
+      <button class="exportChoice" id="textBtn" type="button"><span class="choiceIcon">💬</span><span><strong>Text / Messages</strong><small>Send the breakdown from your share sheet</small></span><span class="choiceArrow">›</span></button>
+      <button class="exportChoice" id="emailBtn" type="button"><span class="choiceIcon">✉</span><span><strong>Email</strong><small>Open a prefilled email summary</small></span><span class="choiceArrow">›</span></button>
+      <button class="exportChoice" id="shareBtn" type="button"><span class="choiceIcon">↗</span><span><strong>More Share Options</strong><small>AirDrop and other supported apps</small></span><span class="choiceArrow">›</span></button>
+      <button class="exportChoice" id="savePngBtn" type="button"><span class="choiceIcon">▣</span><span><strong>Save PNG</strong><small>Keep the branded breakdown image</small></span><span class="choiceArrow">›</span></button>
+    </div>
   </div>
 </div>
 <div class="self-test" id="selfTest" hidden></div>
